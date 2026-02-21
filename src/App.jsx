@@ -15,6 +15,7 @@ import TeamDetailPage from './pages/TeamDetailPage'
 import Navigation from './components/Navigation'
 import SignupPage from './pages/SignupPage'
 import LoginPage from './pages/LoginPage'
+import VoiceInput from './components/VoiceInput'
 
 function App() {
   return (
@@ -41,6 +42,8 @@ function App() {
             <Route path="/teams/:id" element={<TeamDetailPage />} />
           </Routes>
         </AnimatePresence>
+        {/* Floating Voice UI — fixed position, no layout impact */}
+        <VoiceInput />
       </AuthProvider>
     </BrowserRouter>
   )
