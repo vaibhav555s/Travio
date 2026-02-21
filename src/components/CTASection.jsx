@@ -7,7 +7,7 @@ const CTASection = () => {
   return (
     <section className="cta-section">
       <div className="cta-background" />
-      
+
       <div className="container cta-content">
         <motion.div
           className="cta-text"
