@@ -24,8 +24,8 @@ app.use((req, res, next) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/itinerary", itineraryRoutes);
-app.use('/api/trips', tripRoutes);
 app.use('/api/trips', collaboratorRoutes);
+app.use('/api/trips', tripRoutes);
 app.use('/api/plans', planRoutes);
 
 // Error handler

@@ -1,8 +1,11 @@
 // controllers/collaboratorController.js
 import Trip from '../models/Trip.js'
 import User from '../models/User.js'
+import mongoose from 'mongoose'
 
-// ─── Helper ────────────────────────────────────────────────
+// ─── Helpers ────────────────────────────────────────────────
+const toObjId = (id) => new mongoose.Types.ObjectId(id)
+
 const isOwner = (trip, userId) => trip.userId.toString() === userId
 
 const isAcceptedCollaborator = (trip, userId) =>
@@ -113,10 +116,11 @@ export const removeCollaborator = async (req, res) => {
 // GET /api/trips/shared
 export const getSharedTrips = async (req, res) => {
     try {
+        const myId = toObjId(req.user.id)
         const trips = await Trip.find({
-            'collaborators': {
+            collaborators: {
                 $elemMatch: {
-                    userId: req.user.id,
+                    userId: myId,
                     status: 'accepted',
                 }
             }
@@ -132,16 +136,16 @@ export const getSharedTrips = async (req, res) => {
 // GET /api/trips/invites
 export const getMyInvites = async (req, res) => {
     try {
+        const myId = toObjId(req.user.id)
         const trips = await Trip.find({
-            'collaborators': {
+            collaborators: {
                 $elemMatch: {
-                    userId: req.user.id,
+                    userId: myId,
                     status: 'pending',
                 }
             }
         }).sort({ createdAt: -1 })
 
-        // Return only the relevant collaborator entry + trip info
         const invites = trips.map(trip => ({
             tripId: trip._id,
             destination: trip.destination,

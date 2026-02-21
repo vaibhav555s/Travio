@@ -20,7 +20,8 @@ const fadeUp = {
   show: { opacity: 1, y: 0, transition: { duration: 0.38, ease: [0.25, 0.1, 0.25, 1] } },
 }
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5500'
+// Using relative /api paths — Vite proxy forwards to localhost:5500
+const BASE = '/api'
 
 export default function UserDashboard() {
   const { user } = useAuth()
@@ -39,18 +40,27 @@ export default function UserDashboard() {
   // ── Fetch all data on mount ──────────────────────────
   useEffect(() => {
     const fetchAll = async () => {
-      if (!token) { setTripsLoading(false); return }
+      if (!token) { console.warn('[Dashboard] No token — skipping fetch'); setTripsLoading(false); return }
       try {
+        console.log('[Dashboard] Fetching trips + invites...')
         const [ownRes, sharedRes, inviteRes] = await Promise.all([
-          fetch(`${API_URL}/api/trips`, { headers: authHeader }),
-          fetch(`${API_URL}/api/trips/shared`, { headers: authHeader }),
-          fetch(`${API_URL}/api/trips/invites`, { headers: authHeader }),
+          fetch(`${BASE}/trips`, { headers: authHeader }),
+          fetch(`${BASE}/trips/shared`, { headers: authHeader }),
+          fetch(`${BASE}/trips/invites`, { headers: authHeader }),
         ])
+        console.log('[Dashboard] status — own:', ownRes.status, '| shared:', sharedRes.status, '| invites:', inviteRes.status)
         if (ownRes.ok) setRecentTrips(await ownRes.json())
         if (sharedRes.ok) setSharedTrips(await sharedRes.json())
-        if (inviteRes.ok) setPendingInvites(await inviteRes.json())
+        if (inviteRes.ok) {
+          const inv = await inviteRes.json()
+          console.log('[Dashboard] pending invites payload:', inv)
+          setPendingInvites(inv)
+        } else {
+          const body = await inviteRes.text()
+          console.error('[Dashboard] invites fetch failed:', inviteRes.status, body)
+        }
       } catch (err) {
-        console.error('Failed to fetch trips:', err)
+        console.error('[Dashboard] fetch error:', err)
       } finally {
         setTripsLoading(false)
       }
@@ -62,7 +72,7 @@ export default function UserDashboard() {
   const handleAccept = async (tripId) => {
     setAccepting(tripId)
     try {
-      const res = await fetch(`${API_URL}/api/trips/${tripId}/accept`, {
+      const res = await fetch(`${BASE}/trips/${tripId}/accept`, {
         method: 'POST', headers: authHeader,
       })
       if (res.ok) {
@@ -91,7 +101,7 @@ export default function UserDashboard() {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]))
       const myId = payload.id || payload._id || payload.sub
-      const res = await fetch(`${API_URL}/api/trips/${tripId}/collaborators/${myId}`, {
+      const res = await fetch(`${BASE}/trips/${tripId}/collaborators/${myId}`, {
         method: 'DELETE', headers: authHeader,
       })
       if (res.ok) setPendingInvites(prev => prev.filter(i => i.tripId !== tripId))
@@ -124,66 +134,68 @@ export default function UserDashboard() {
           <div className="ud-header-divider" />
         </motion.div>
 
-        {/* ── Pending Invites — only shown when there are pending invites ── */}
-        <AnimatePresence>
-          {!tripsLoading && pendingInvites.length > 0 && (
-            <motion.div
-              variants={fadeUp} initial="hidden" animate="show"
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ delay: 0.05 }}
-            >
-              <div className="ud-invites-header">
-                <p className="ud-section-title" style={{ margin: 0 }}>Trip Invites</p>
-                <span className="ud-invite-badge">{pendingInvites.length} pending</span>
-              </div>
+        {/* ── Trip Invites — always visible ── */}
+        <motion.div variants={fadeUp} initial="hidden" animate="show" transition={{ delay: 0.05 }}>
+          <div className="ud-invites-header">
+            <p className="ud-section-title" style={{ margin: 0 }}>Trip Invites</p>
+            {!tripsLoading && pendingInvites.length > 0 && (
+              <span className="ud-invite-badge">{pendingInvites.length} pending</span>
+            )}
+          </div>
 
-              <div className="ud-invites-list">
-                <AnimatePresence>
-                  {pendingInvites.map(invite => (
-                    <motion.div
-                      key={invite.tripId}
-                      className="ud-invite-card"
-                      initial={{ opacity: 0, x: -16 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 16, transition: { duration: 0.22 } }}
-                    >
-                      <div className="ud-invite-left">
-                        <div className="ud-invite-icon">✈️</div>
-                        <div>
-                          <p className="ud-invite-dest">{invite.destination}</p>
-                          <p className="ud-invite-dates">
-                            {invite.departureDate?.slice(0, 10)} → {invite.returnDate?.slice(0, 10)}
-                          </p>
-                        </div>
+          {tripsLoading ? (
+            <div className="ud-empty">Checking for invites…</div>
+          ) : pendingInvites.length === 0 ? (
+            <div className="ud-empty">
+              🎉 No pending invites right now. When someone invites you to their trip, it'll appear here.
+            </div>
+          ) : (
+            <div className="ud-invites-list">
+              <AnimatePresence>
+                {pendingInvites.map(invite => (
+                  <motion.div
+                    key={String(invite.tripId)}
+                    className="ud-invite-card"
+                    initial={{ opacity: 0, x: -16 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 16, transition: { duration: 0.22 } }}
+                  >
+                    <div className="ud-invite-left">
+                      <div className="ud-invite-icon">✈️</div>
+                      <div>
+                        <p className="ud-invite-dest">{invite.destination}</p>
+                        <p className="ud-invite-dates">
+                          {invite.departureDate?.slice?.(0, 10)} → {invite.returnDate?.slice?.(0, 10)}
+                        </p>
                       </div>
+                    </div>
 
-                      <div className="ud-invite-actions">
-                        <button
-                          className="ud-invite-btn accept"
-                          onClick={() => handleAccept(invite.tripId)}
-                          disabled={accepting === invite.tripId || declining === invite.tripId}
-                        >
-                          {accepting === invite.tripId
-                            ? <span className="ud-invite-spinner" />
-                            : '✓ Accept'}
-                        </button>
-                        <button
-                          className="ud-invite-btn decline"
-                          onClick={() => handleDecline(invite.tripId)}
-                          disabled={accepting === invite.tripId || declining === invite.tripId}
-                        >
-                          {declining === invite.tripId
-                            ? <span className="ud-invite-spinner" />
-                            : 'Decline'}
-                        </button>
-                      </div>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-              </div>
-            </motion.div>
+                    <div className="ud-invite-actions">
+                      <button
+                        className="ud-invite-btn accept"
+                        onClick={() => handleAccept(String(invite.tripId))}
+                        disabled={accepting === String(invite.tripId) || declining === String(invite.tripId)}
+                      >
+                        {accepting === String(invite.tripId)
+                          ? <span className="ud-invite-spinner" />
+                          : '✓ Accept'}
+                      </button>
+                      <button
+                        className="ud-invite-btn decline"
+                        onClick={() => handleDecline(String(invite.tripId))}
+                        disabled={accepting === String(invite.tripId) || declining === String(invite.tripId)}
+                      >
+                        {declining === String(invite.tripId)
+                          ? <span className="ud-invite-spinner" />
+                          : 'Decline'}
+                      </button>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
           )}
-        </AnimatePresence>
+        </motion.div>
 
         {/* ── Upcoming Trip ── */}
         <motion.div variants={fadeUp} initial="hidden" animate="show" transition={{ delay: 0.1 }}>
