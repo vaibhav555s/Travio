@@ -1,9 +1,21 @@
-import { motion } from 'framer-motion'
+import { motion, useScroll, useTransform } from 'framer-motion'
+import { useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { ScrollIndicator, ArrowRightIcon } from './SVGIcons'
 import './HeroSection.css'
 
 const HeroSection = () => {
+  const ref = useRef(null)
+
+  // Parallax scroll setup
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ['start start', 'end start'],
+  })
+
+  // The background will move at half the speed of the scroll
+  const backgroundY = useTransform(scrollYProgress, [0, 1], ['0%', '50%'])
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -35,15 +47,18 @@ const HeroSection = () => {
   }
 
   return (
-    <section className="hero">
-      <div className="hero-background">
+    <section className="hero" ref={ref}>
+      <motion.div
+        className="hero-background"
+        style={{ y: backgroundY }}
+      >
         <img
           src="https://images.unsplash.com/photo-1464207687429-7505649dae38?w=1600&h=900&fit=crop"
           alt="Scenic road trip"
           className="hero-image"
         />
         <div className="hero-overlay" />
-      </div>
+      </motion.div>
 
       <div className="hero-content container">
         <motion.div
@@ -57,11 +72,11 @@ const HeroSection = () => {
           </motion.span>
 
           <motion.h1 className="text-hero" variants={itemVariants}>
-            Drive the Scenic Route
+            Drive the <span className="text-gradient">Scenic Route</span>
           </motion.h1>
 
           <motion.p className="text-lead" variants={itemVariants}>
-            AI-powered road trip planning. Explore hidden gems, scenic drives, and unforgettable destinations along the radiator routes.
+            <span className="text-gradient">AI-powered</span> road trip planning. Explore hidden gems, scenic drives, and unforgettable destinations along the radiator routes.
           </motion.p>
 
           <motion.div className="hero-buttons" variants={itemVariants}>

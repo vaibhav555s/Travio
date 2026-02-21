@@ -58,8 +58,8 @@
 
 .cta-button:hover {
   background: var(--color-accent-light);
-  transform: translateY(-3px);
-  box-shadow: 0 20px 40px rgba(217, 119, 6, 0.3);
+  transform: translateY(-4px);
+  box-shadow: 0 15px 35px rgba(217, 119, 6, 0.6), 0 0 20px rgba(217, 119, 6, 0.4);
 }
 
 .cta-stats {
