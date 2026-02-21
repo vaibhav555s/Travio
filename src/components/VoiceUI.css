@@ -1,0 +1,248 @@
+/* ═══════════════════════════════════
+   VoiceUI.css
+   Radiator Routes — Voice Input System
+   ═══════════════════════════════════ */
+
+/* ── Idle FAB (bottom-right) ── */
+.vi-fab {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    z-index: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #F59E0B 0%, #FDBA74 100%);
+    box-shadow: 0 6px 22px rgba(245, 158, 11, 0.38), 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+    outline: none;
+    color: white;
+    /* Ensure mic is white on amber gradient */
+}
+
+.vi-fab:hover {
+    transform: scale(1.08) translateY(-2px);
+    box-shadow: 0 10px 30px rgba(245, 158, 11, 0.5);
+}
+
+.vi-fab:active {
+    transform: scale(0.95);
+}
+
+/* ── Scrim (5% dim) ── */
+.vi-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 899;
+    background: rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(0.5px);
+    pointer-events: all;
+}
+
+/* ── Expanded center bar ── */
+.vi-bar-wrap {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 900;
+    width: min(680px, 92vw);
+    pointer-events: all;
+}
+
+.vi-bar {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    background: #FFF8ED;
+    border: 1.5px solid rgba(245, 158, 11, 0.28);
+    border-radius: 999px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.13), 0 2px 6px rgba(0, 0, 0, 0.06);
+    overflow: visible;
+    padding: 6px 8px 6px 8px;
+    height: 58px;
+}
+
+/* ── Mic button (left) ── */
+.vi-mic {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.22s ease, box-shadow 0.22s ease;
+    background: linear-gradient(135deg, #F59E0B, #FDBA74);
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+    outline: none;
+    color: white;
+}
+
+.vi-mic:hover {
+    filter: brightness(1.07);
+}
+
+.vi-mic.listening {
+    background: linear-gradient(135deg, #EF4444, #F87171);
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+    animation: vi-pulse 1.35s ease infinite;
+}
+
+@keyframes vi-pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.55), 0 2px 8px rgba(239, 68, 68, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 8px rgba(239, 68, 68, 0), 0 2px 8px rgba(239, 68, 68, 0.4);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0), 0 2px 8px rgba(239, 68, 68, 0.4);
+    }
+}
+
+/* Road-line divider (Cars-themed accent) */
+.vi-divider {
+    width: 1px;
+    height: 22px;
+    background: linear-gradient(to bottom, transparent, rgba(245, 158, 11, 0.3), transparent);
+    margin: 0 10px;
+    flex-shrink: 0;
+}
+
+/* ── Text input (center) ── */
+.vi-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 0.93rem;
+    color: #1a1a1a;
+    font-family: inherit;
+    padding: 0 4px;
+    caret-color: #F59E0B;
+    min-width: 0;
+    transition: cursor 0.2s;
+}
+
+.vi-input::placeholder {
+    color: #9ca3af;
+    transition: color 0.22s;
+}
+
+.vi-input.frozen {
+    cursor: not-allowed;
+    color: #333;
+}
+
+.vi-input.frozen::placeholder {
+    color: #EF4444;
+}
+
+/* ── Cancel (✕) ── */
+.vi-cancel {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0, 0, 0, 0.06);
+    color: #6b7280;
+    font-size: 0.78rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s, color 0.15s, transform 0.15s;
+    margin-left: 6px;
+}
+
+.vi-cancel:hover {
+    background: rgba(0, 0, 0, 0.1);
+    color: #1a1a1a;
+    transform: scale(1.08);
+}
+
+/* ── Submit (➜) — visible only when text exists ── */
+.vi-submit {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #F59E0B, #E8631A);
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-left: 6px;
+    box-shadow: 0 2px 8px rgba(232, 99, 26, 0.3);
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.vi-submit:hover {
+    transform: scale(1.08);
+    box-shadow: 0 4px 14px rgba(232, 99, 26, 0.4);
+}
+
+/* ── "Tap to speak" tooltip callout ── */
+.vi-tip {
+    position: absolute;
+    bottom: calc(100% + 12px);
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    background: #FFF8ED;
+    border: 1.5px solid rgba(245, 158, 11, 0.4);
+    border-radius: 10px;
+    padding: 6px 13px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: #92400e;
+    letter-spacing: 0.02em;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+    pointer-events: none;
+    z-index: 920;
+}
+
+/* Downward arrow via rotated square — points directly at mic button center */
+.vi-tip::after {
+    content: '';
+    position: absolute;
+    bottom: -7px;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    width: 12px;
+    height: 12px;
+    background: #FFF8ED;
+    border-right: 1.5px solid rgba(245, 158, 11, 0.4);
+    border-bottom: 1.5px solid rgba(245, 158, 11, 0.4);
+}
+
+/* ── Mobile ── */
+@media (max-width: 600px) {
+    .vi-fab {
+        bottom: 20px;
+        right: 16px;
+    }
+
+    .vi-bar-wrap {
+        bottom: 16px;
+        width: 96vw;
+    }
+
+    .vi-input {
+        font-size: 0.86rem;
+    }
+}
