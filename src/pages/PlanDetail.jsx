@@ -11,7 +11,7 @@ export default function PlanDetail() {
   const { planId } = useParams()
   const navigate = useNavigate()
   const plan = mockPlans.find(p => p.id === planId) || mockPlans[0]
-  
+
   const [selectedDay, setSelectedDay] = useState(1)
   const [showWhatIf, setShowWhatIf] = useState(false)
 
