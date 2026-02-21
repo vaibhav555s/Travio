@@ -2,7 +2,7 @@ const fs = require('fs');
 
 async function test() {
     try {
-        const r = await fetch('http://localhost:5000/api/itinerary/refine', {
+        const r = await fetch('http://localhost:5500/api/itinerary/refine', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import './BudgetSlider.css'
 
-const BudgetSlider = ({ value, onChange, min = 5000, max = 200000, step = 100 }) => {
+const BudgetSlider = ({ value, onChange, min = 5500, max = 200000, step = 100 }) => {
   const [isEditing, setIsEditing] = useState(false)
   const [inputValue, setInputValue] = useState(value)
 
