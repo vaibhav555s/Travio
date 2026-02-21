@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import authRoutes from "./routes/auth.js";
 import itineraryRoutes from "./routes/itineraryRoutes.js";
+import speechRoutes from "./routes/speech.js";
 import tripRoutes from "./routes/trip.routes.js"
 import planRoutes from "./routes/plan.routes.js"
 import collaboratorRoutes from "./routes/collaborator.routes.js"
@@ -24,6 +25,7 @@ app.use((req, res, next) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/itinerary", itineraryRoutes);
+app.use("/api", speechRoutes);
 app.use('/api/trips', collaboratorRoutes);
 app.use('/api/trips', tripRoutes);
 app.use('/api/plans', planRoutes);

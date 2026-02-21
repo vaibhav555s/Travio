@@ -49,6 +49,18 @@ const Crew = () => {
         sessionStorage.setItem('tripSetupData', JSON.stringify({ ...parsed, travelers: travelers.length }))
         window.dispatchEvent(new Event('tripDataUpdated'))
       }
+
+      // ── Voice Auto-Submit (Jump to Processing) ──
+      if (parsed.autoSubmitCrew) {
+        console.log('[Crew] 🚀 Auto-submitting crew for voice trip...')
+        // Remove flag to prevent loop
+        sessionStorage.setItem('tripSetupData', JSON.stringify({ ...parsed, autoSubmitCrew: false }))
+
+        const timer = setTimeout(() => {
+          handleSubmit() // Call directly
+        }, 500)
+        return () => clearTimeout(timer)
+      }
     }
   }, [travelers])
 
@@ -70,7 +82,7 @@ const Crew = () => {
   }
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    if (e) e.preventDefault()
     // Save final state explicitly before navigating
     sessionStorage.setItem('crewData', JSON.stringify(travelers))
     console.log('Crew data:', travelers)

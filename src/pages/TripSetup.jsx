@@ -94,6 +94,8 @@ const TripSetup = () => {
         budget: parsed.budget || 30000,
         travelers: parsed.travelers || 1,
         vibes: parsed.vibes || [],
+        autoSubmit: parsed.autoSubmit || false,
+        autoSubmitCrew: parsed.autoSubmitCrew || false,
       }
     }
     return {
@@ -109,8 +111,36 @@ const TripSetup = () => {
 
   // ── Consistency: persist to sessionStorage on every change ──
   useEffect(() => {
+    // Preserve autoSubmit flags if they exist in state but not yet saved
     sessionStorage.setItem('tripSetupData', JSON.stringify(formData))
     window.dispatchEvent(new Event('tripDataUpdated'))
+
+    // ── Voice Auto-Submit ──
+    if (formData.autoSubmit) {
+      console.log('[TripSetup] 🚀 Auto-submit detected in state. Checking validation...')
+
+      const newErrors = {}
+      if (!formData.source) newErrors.source = 'Missing source'
+      if (!formData.destination) newErrors.destination = 'Missing destination'
+      if (!formData.departureDate) newErrors.departureDate = 'Missing departure date'
+      if (!formData.returnDate) newErrors.returnDate = 'Missing return date'
+      if (formData.vibes.length === 0) newErrors.vibes = 'Missing vibes'
+
+      if (Object.keys(newErrors).length === 0) {
+        console.log('[TripSetup] ✅ Validation passed. Navigating to crew in 500ms...')
+
+        // Remove flag from state to prevent loops
+        setFormData(prev => ({ ...prev, autoSubmit: false }))
+
+        const timer = setTimeout(() => {
+          handleSubmit() // Call directly
+        }, 500)
+        return () => clearTimeout(timer)
+      } else {
+        console.warn('[TripSetup] ❌ Auto-submit blocked by validation errors:', newErrors)
+        setFormData(prev => ({ ...prev, autoSubmit: false }))
+      }
+    }
   }, [formData])
 
   const handleInputChange = (field, value) => {
@@ -118,7 +148,9 @@ const TripSetup = () => {
   }
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    if (e) e.preventDefault()
+
+    console.log('[TripSetup] Submitting form...')
     const newErrors = {}
     if (!formData.source) newErrors.source = 'Please enter your starting city'
     if (!formData.destination) newErrors.destination = 'Please enter a destination'
@@ -127,13 +159,14 @@ const TripSetup = () => {
     if (formData.vibes.length === 0) newErrors.vibes = 'Please select at least one trip vibe'
 
     if (Object.keys(newErrors).length > 0) {
+      console.warn('[TripSetup] Submit blocked by errors:', newErrors)
       setErrors(newErrors)
       return
     }
 
     setErrors({})
+    console.log('[TripSetup] Success! Navigating to /crew')
     navigate('/crew')
-
   }
 
   const progressSteps = [

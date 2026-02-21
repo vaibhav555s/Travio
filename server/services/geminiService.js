@@ -222,3 +222,58 @@ Return ONLY valid JSON (no markdown, no conversation).`
     return extractJSON(text)
   })
 }
+
+export async function extractTripParams(userPrompt) {
+  const prompt = `You are a structured travel parameter extractor. 
+Extract travel parameters from the user's request. 
+
+Return ONLY valid JSON (no markdown, no explanation) with this structure:
+{
+  "source": string,
+  "destination": string,
+  "days": number,
+  "budget": number,
+  "travelers": number,
+  "departureDate": string,
+  "returnDate": string,
+  "vibes": array of strings,
+  "crew": [
+    { "name": string, "age": number, "interests": array of strings }
+  ]
+}
+
+Rules:
+- source: Extract starting city. Default to "Mumbai".
+- destination: Extract target city. Mandatory.
+- days: If not mentioned, default to 3.
+- travelers: If not mentioned, default to 1.
+- budget: If not mentioned, default to 15000.
+- departureDate/returnDate: YYYY-MM-DD. Default to empty string "".
+- vibes: Extract interests. Default to ["Sightseeing"].
+- crew: Extract specific traveler details if mentioned (names, ages, hobbies). If none mentioned, return empty array [].
+- If destination cannot be confidently detected, return { "destination": "" }.
+
+Do not return explanations. 
+Do not wrap in markdown.
+Return only raw JSON.
+
+User request: "${userPrompt}"`
+
+  return withRetry(async () => {
+    try {
+      const completion = await openai.chat.completions.create({
+        model: GROK_MODEL,
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.1,
+        response_format: { type: 'json_object' },
+        max_tokens: 1000
+      })
+      const text = completion.choices[0].message.content
+      console.log('[grokService] Raw extraction response:', text)
+      return extractJSON(text)
+    } catch (err) {
+      console.error('[grokService] Extraction Error:', err.message)
+      throw err
+    }
+  })
+}

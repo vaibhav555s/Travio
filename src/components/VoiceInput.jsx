@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import './VoiceUI.css'
 
@@ -26,12 +27,143 @@ const ArrowIcon = () => (
    VoiceInput — self-contained voice UI
    ════════════════════════════════════════ */
 const VoiceInput = () => {
+    const navigate = useNavigate()
+    const location = useLocation()
     const [isExpanded, setIsExpanded] = useState(false)
     const [isListening, setIsListening] = useState(false)
     const [text, setText] = useState('')
     const [showTip, setShowTip] = useState(false)
+    const [mediaRecorder, setMediaRecorder] = useState(null)
+    const [audioChunks, setAudioChunks] = useState([])
     const inputRef = useRef(null)
     const tipTimer = useRef(null)
+
+    /* ── Recording Logic ── */
+    const startRecording = async () => {
+        try {
+            console.log("🎙 Requesting microphone access...")
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+            const recorder = new MediaRecorder(stream)
+
+            recorder.onstart = () => {
+                console.log("🎤 Recording started")
+                setAudioChunks([])
+            }
+
+            recorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    console.log("📦 Audio chunk received")
+                    setAudioChunks((prev) => [...prev, event.data])
+                }
+            }
+
+            recorder.onstop = async () => {
+                console.log("⏹ Recording stopped")
+                // Use the ref or current state to get chunks
+                // Note: setAudioChunks is async, but onstop happens after all dataavailable
+            }
+
+            recorder.start()
+            setMediaRecorder(recorder)
+            setIsListening(true)
+        } catch (error) {
+            console.error("❌ Mic error:", error)
+        }
+    }
+
+    const stopRecording = () => {
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+            mediaRecorder.stop()
+            setIsListening(false)
+
+            // Process chunks after a tiny delay to ensure all data is collected
+            setTimeout(async () => {
+                // We need the most recent chunks. Since we're in a closure, 
+                // we might need a ref for chunks or use the callback pattern.
+                // However, the user provided a simple version. Let's refine for reliability.
+            }, 100)
+        }
+    }
+
+    // Effect to handle the actual sending when recording stops and chunks are ready
+    useEffect(() => {
+        if (!isListening && audioChunks.length > 0 && mediaRecorder) {
+            const audioBlob = new Blob(audioChunks, { type: "audio/webm" })
+            console.log("📁 Blob created:", audioBlob)
+            sendAudioToServer(audioBlob)
+            setAudioChunks([]) // clear for next time
+        }
+    }, [isListening, audioChunks.length, mediaRecorder])
+
+    const performExtractionAndRedirect = async (userInput) => {
+        if (location.pathname !== '/') return
+
+        console.log("📍 Landing Page detected, extracting parameters for:", userInput)
+        try {
+            const extractResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/itinerary/voice-to-setup`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ prompt: userInput }),
+            })
+            const extractData = await extractResponse.json()
+
+            if (extractData.error === "DESTINATION_REQUIRED") {
+                alert("Please specify a destination in your request.")
+                return
+            }
+
+            if (extractData.destination) {
+                // 1. Prepare Trip Setup data
+                const tripSetupData = { ...extractData }
+
+                // 2. Prepare Crew data if extracted
+                if (Array.isArray(extractData.crew) && extractData.crew.length > 0) {
+                    console.log("👥 Crew details extracted:", extractData.crew)
+                    const savedCrew = extractData.crew.map((member, idx) => ({
+                        id: idx + 1,
+                        name: member.name || `Traveler ${idx + 1}`,
+                        age: member.age || '',
+                        interests: Array.isArray(member.interests) ? member.interests : []
+                    }))
+                    sessionStorage.setItem("crewData", JSON.stringify(savedCrew))
+                    tripSetupData.autoSubmitCrew = true
+                } else {
+                    tripSetupData.autoSubmitCrew = true
+                }
+
+                // 3. Save and Navigate
+                sessionStorage.setItem("tripSetupData", JSON.stringify(tripSetupData))
+                window.dispatchEvent(new Event('tripDataUpdated'))
+                navigate("/setup")
+                setIsExpanded(false)
+            }
+        } catch (err) {
+            console.error("❌ Extraction error:", err)
+        }
+    }
+
+    const sendAudioToServer = async (blob) => {
+        console.log("🚀 Sending audio to backend...")
+        try {
+            const formData = new FormData()
+            formData.append("audio", blob)
+
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/speech-to-text`, {
+                method: "POST",
+                body: formData,
+            })
+
+            const data = await response.json()
+            console.log("📝 Transcription received:", data)
+
+            if (data.text) {
+                setText(data.text)
+                await performExtractionAndRedirect(data.text)
+            }
+        } catch (error) {
+            console.error("❌ Send error:", error)
+        }
+    }
 
     /* Focus input + show tip when bar opens */
     useEffect(() => {
@@ -50,14 +182,13 @@ const VoiceInput = () => {
 
     /* ── Mic toggle inside bar ── */
     const handleMicToggle = () => {
-        // Dismiss tip immediately on mic click
         setShowTip(false)
         clearTimeout(tipTimer.current)
         if (isListening) {
-            setIsListening(false)
+            stopRecording()
             setTimeout(() => inputRef.current?.focus(), 60)
         } else {
-            setIsListening(true)
+            startRecording()
         }
     }
 
@@ -76,10 +207,10 @@ const VoiceInput = () => {
     }
 
     /* ── Submit ── */
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (!text.trim()) return
-        console.log('[VoiceInput] Trip query:', text)
-        // TODO: wire to trip generation
+        console.log('[VoiceInput] Trip query submit:', text)
+        await performExtractionAndRedirect(text)
     }
 
     /* ── Enter key submits ── */
