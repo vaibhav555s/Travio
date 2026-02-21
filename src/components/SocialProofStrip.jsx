@@ -1,49 +1,74 @@
 import { motion } from 'framer-motion'
 import './SocialProofStrip.css'
 
+const AVATARS = [
+  { initials: 'AK', hue: 220 },
+  { initials: 'RS', hue: 15 },
+  { initials: 'MJ', hue: 160 },
+  { initials: 'PD', hue: 280 },
+  { initials: 'ST', hue: 45 },
+]
+
+const STATS = [
+  { num: '50K+', label: 'Trips Planned', icon: '🗺️' },
+  { num: '4.9★', label: 'Avg Rating', icon: '⭐' },
+  { num: '200+', label: 'Scenic Routes', icon: '🏔️' },
+  { num: '48', label: 'Countries', icon: '🌍' },
+]
+
 const SocialProofStrip = () => {
-  const stats = [
-    { number: '50K+', label: 'Road Trips Planned' },
-    { number: '200+', label: 'Scenic Routes' },
-    { number: '4.9★', label: 'User Rating' },
-  ]
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.2,
-      },
-    },
-  }
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6 },
-    },
-  }
-
   return (
     <section className="social-proof">
       <div className="container">
         <motion.div
-          className="proof-grid"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-100px' }}
+          className="sp-inner"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.65 }}
         >
-          {stats.map((stat, idx) => (
-            <motion.div key={idx} className="proof-item" variants={itemVariants}>
-              <div className="stat-number text-display">{stat.number}</div>
-              <div className="stat-label text-body-sm">{stat.label}</div>
-            </motion.div>
-          ))}
+          {/* Left — stacked avatars + label */}
+          <div className="sp-social">
+            <div className="sp-avatars">
+              {AVATARS.map((a, i) => (
+                <div
+                  key={i}
+                  className="sp-avatar"
+                  style={{
+                    background: `hsl(${a.hue}, 58%, 52%)`,
+                    marginLeft: i === 0 ? 0 : -12,
+                    zIndex: AVATARS.length - i,
+                  }}
+                >
+                  {a.initials}
+                </div>
+              ))}
+            </div>
+            <div className="sp-social-text">
+              <span className="sp-social-headline">Loved by travellers worldwide</span>
+              <span className="sp-social-sub">Join 50,000+ happy adventurers</span>
+            </div>
+          </div>
+
+          <div className="sp-divider" />
+
+          {/* Right — stat pills */}
+          <div className="sp-stats">
+            {STATS.map((s, i) => (
+              <motion.div
+                key={s.label}
+                className="sp-stat"
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.08 }}
+              >
+                <span className="sp-stat-icon">{s.icon}</span>
+                <span className="sp-stat-num">{s.num}</span>
+                <span className="sp-stat-label">{s.label}</span>
+              </motion.div>
+            ))}
+          </div>
         </motion.div>
       </div>
     </section>
