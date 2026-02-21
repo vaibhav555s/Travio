@@ -1,12 +1,19 @@
 import { Router } from 'express'
 import { generateOptionsHandler, generateItineraryHandler } from '../controllers/itineraryController.js'
+import { protect } from '../middleware/auth.js'
 
 const router = Router()
 
-// POST /api/generate-options
-router.post('/generate-options', generateOptionsHandler)
+// optionalAuth - attaches user if token exists, but doesn't block if not
+const optionalAuth = (req, res, next) => {
+  const authHeader = req.headers.authorization
+  if (authHeader?.startsWith('Bearer ')) {
+    return protect(req, res, next)  // sets req.user if valid
+  }
+  next()  // continues without req.user
+}
 
-// POST /api/generate-itinerary
-router.post('/generate-itinerary', generateItineraryHandler)
+router.post('/generate-options',   optionalAuth, generateOptionsHandler)
+router.post('/generate-itinerary', optionalAuth, generateItineraryHandler)
 
 export default router

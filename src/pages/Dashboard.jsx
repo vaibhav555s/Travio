@@ -1,20 +1,51 @@
-import { useState } from 'react'
+import { useState,useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import ActivityCard from '../components/ActivityCard'
 import CrewChat from '../components/CrewChat'
 import Toast from '../components/Toast'
 import { mockPlans } from '../data/mockPlans'
 import './Dashboard.css'
-
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
 export default function Dashboard() {
   const [showCrewChat, setShowCrewChat] = useState(false)
   const [toast, setToast] = useState(null)
   const [currentDay] = useState(2)
   const [weather, setWeather] = useState(false)
+  const [plan, setPlan]         = useState(null)
+  const [loading, setLoading]   = useState(true)
 
-  const plan = mockPlans[0]
-  const currentDayData = plan.days.find(d => d.day === currentDay) || plan.days[0]
+  useEffect(() => {
+    const loadDashboard = async () => {
+      try {
+        const saved  = sessionStorage.getItem('tripSetupData')
+        const tripData = saved ? JSON.parse(saved) : {}
+        const token  = localStorage.getItem('accessToken')
 
+        if (tripData.tripId && token) {
+          const res = await fetch(
+            `${API_URL}/api/plans/trip/${tripData.tripId}/selected`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          )
+          if (res.ok) {
+            const data = await res.json()
+            setPlan(data)
+          }
+        }
+      } catch (err) {
+        console.error('Dashboard load error:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadDashboard()
+  }, [])
+  if (loading) return <div className="dashboard">Loading...</div>
+  const activePlan = plan || mockPlans[0]
+  const currentDayData = activePlan.days?.find(d => d.day === currentDay) 
+    || activePlan.dailyPlan?.find(d => d.day === currentDay)
+    || activePlan.days?.[0]
+    || activePlan.dailyPlan?.[0]
   const handleSimulateRain = () => {
     setWeather(true)
     setToast({
@@ -24,6 +55,7 @@ export default function Dashboard() {
   }
 
   return (
+    
     <motion.div
       className="dashboard"
       initial={{ opacity: 0, y: 16 }}

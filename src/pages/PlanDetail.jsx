@@ -40,37 +40,76 @@ export default function PlanDetail() {
   const accent = ACCENTS[planId] || '#E8631A'
   const photo = PHOTOS[planId] || PHOTOS.recommended
   const title = TITLES[planId] || 'Your Itinerary'
+  const handleSelectRoute = async () => {
+    try {
+      const savedOptions = sessionStorage.getItem('generatedOptions')
+      const options = savedOptions ? JSON.parse(savedOptions) : []
+      const matchedOption = options.find(o => o.id === planId)
+      const token = localStorage.getItem('accessToken')
+  
+      if (matchedOption?.planId && token) {
+        await fetch(`${API_URL}/api/plans/${matchedOption.planId}/select`, {
+          method: 'PATCH',
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      }
+  
+      navigate('/dashboard')
+    } catch (err) {
+      console.error('Failed to select plan:', err)
+      navigate('/dashboard') // still navigate on failure
+    }
+  }
+  
 
   useEffect(() => {
-    const fetchItinerary = async () => {
-      try {
-        const saved = sessionStorage.getItem('tripSetupData')
-        const originalTripData = saved ? JSON.parse(saved) : {}
+    // PlanDetail.jsx - update fetchItinerary
+const fetchItinerary = async () => {
+  try {
+    const saved = sessionStorage.getItem('tripSetupData')
+    const originalTripData = saved ? JSON.parse(saved) : {}
 
-        const response = await fetch(`${API_URL}/api/generate-itinerary`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            selectedOptionId: planId,
-            originalTripData,
-          }),
-        })
+    // Get planId from generatedOptions
+    const savedOptions = sessionStorage.getItem('generatedOptions')
+    const options = savedOptions ? JSON.parse(savedOptions) : []
+    const matchedOption = options.find(o => o.id === planId)
+    const token = localStorage.getItem('accessToken')
 
-        if (!response.ok) {
-          const err = await response.json()
-          throw new Error(err.error || 'Server error')
-        }
+    const response = await fetch(`${API_URL}/api/itinerary/generate-itinerary`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token && { Authorization: `Bearer ${token}` })
+      },
+      body: JSON.stringify({
+        selectedOptionId: planId,
+        originalTripData,
+        tripId:  originalTripData.tripId,
+        planId:  matchedOption?.planId,       // ← from backend response
+      }),
+    })
 
-        const data = await response.json()
-        setItinerary(data)
-        setSelectedDay(data.dailyPlan?.[0]?.day || 1)
-      } catch (err) {
-        console.error('[PlanDetail] Error:', err)
-        setError(err.message || 'Failed to load itinerary.')
-      } finally {
-        setLoading(false)
-      }
+    if (!response.ok) {
+      const err = await response.json()
+      throw new Error(err.error || 'Server error')
     }
+
+    const data = await response.json()
+    setItinerary(data)
+
+    // Store itineraryId for dashboard use
+    if (data.itineraryId) {
+      sessionStorage.setItem('itineraryId', data.itineraryId)
+    }
+
+    setSelectedDay(data.dailyPlan?.[0]?.day || 1)
+  } catch (err) {
+    console.error('[PlanDetail] Error:', err)
+    setError(err.message || 'Failed to load itinerary.')
+  } finally {
+    setLoading(false)
+  }
+}
 
     fetchItinerary()
   }, [planId])
@@ -227,14 +266,14 @@ export default function PlanDetail() {
             <div className="summary-divider" />
 
             <motion.button
-              className="button button-primary"
-              onClick={() => navigate('/dashboard')}
-              style={{ backgroundColor: accent }}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              Select this route →
-            </motion.button>
+            className="button button-primary"
+            onClick={handleSelectRoute}   // ← updated
+            style={{ backgroundColor: accent }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            Select this route →
+          </motion.button>
 
             <motion.button
               className="button button-outline"

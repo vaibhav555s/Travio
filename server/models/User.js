@@ -1,3 +1,4 @@
+// models/User.js
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
@@ -8,13 +9,17 @@ const userSchema = new mongoose.Schema({
   provider:     { type: String, default: "local" },
   googleId:     { type: String },
   refreshToken: { type: String },
+
   travelPersonality: {
     budgetFlexibility: { type: String, default: "medium" },
     travelSpeed:       { type: String, default: "moderate" },
     riskTolerance:     { type: String, default: "medium" },
     socialPreference:  { type: String, default: "group" },
   },
+
+  // References to Trip model
   tripHistory: [{ type: mongoose.Schema.Types.ObjectId, ref: "Trip" }],
+
 }, { timestamps: true });
 
 userSchema.pre("save", async function () {

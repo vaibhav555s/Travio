@@ -6,6 +6,7 @@ import BudgetSlider from '../components/BudgetSlider'
 import TravelerStepper from '../components/TravelerStepper'
 import VibeChips from '../components/VibeChips'
 import { MapPinIcon, CalendarIcon, ArrowRightIcon } from '../components/SVGIcons'
+import axios from 'axios'
 import './TripSetup.css'
 
 const MapModal = ({ isOpen, onClose, onSelect }) => {
@@ -89,23 +90,48 @@ const TripSetup = () => {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    const newErrors = {}
-    if (!formData.destination) newErrors.destination = 'Please enter a destination'
-    if (!formData.departureDate) newErrors.departureDate = 'Departure date is required'
-    if (!formData.returnDate) newErrors.returnDate = 'Return date is required'
-    if (formData.vibes.length === 0) newErrors.vibes = 'Please select at least one trip vibe'
+  // TripSetup.jsx
+const handleSubmit = async (e) => {
+  e.preventDefault()
+  const newErrors = {}
+  if (!formData.destination) newErrors.destination = 'Please enter a destination'
+  if (!formData.departureDate) newErrors.departureDate = 'Departure date is required'
+  if (!formData.returnDate) newErrors.returnDate = 'Return date is required'
+  if (formData.vibes.length === 0) newErrors.vibes = 'Please select at least one trip vibe'
 
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors)
+  if (Object.keys(newErrors).length > 0) {
+    setErrors(newErrors)
+    return
+  }
+
+  setErrors({})
+
+  try {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      navigate('/login')
       return
     }
-
-    setErrors({})
-    console.log('Trip setup data:', formData)
+    const { data } = await axios.post(
+      `${import.meta.env.VITE_API_URL}/api/trips`,
+      formData,
+      { 
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        } 
+      }
+    )
+    // Store tripId in sessionStorage for later use
+    sessionStorage.setItem('tripSetupData', JSON.stringify({ ...formData, tripId: data._id }))
+    navigate('/crew')
+  } catch (err) {
+    console.error('Failed to save trip:', err)
+    // Still navigate even if save fails (graceful degradation)
+    sessionStorage.setItem('tripSetupData', JSON.stringify(formData))
     navigate('/crew')
   }
+}
 
   const progressSteps = [
     { label: 'Destination', completed: !!formData.destination },
