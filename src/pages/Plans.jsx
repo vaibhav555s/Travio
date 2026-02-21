@@ -2,14 +2,15 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import PlanCard from '../components/PlanCard'
-import { mockPlans } from '../data/mockPlans'
 import './Plans.css'
 
 const Plans = () => {
   const avatarColors = ['#E8631A', '#4A9EDB', '#E8A21A', '#6B9E4A']
   const [tripInfo, setTripInfo] = useState({ travelers: 1, destination: 'Goa', days: 5, mockTravelersList: [{ name: 'T1' }] })
+  const [options, setOptions] = useState([])
 
   useEffect(() => {
+    // Load trip info
     const saved = sessionStorage.getItem('tripSetupData')
     if (saved) {
       const data = JSON.parse(saved)
@@ -20,16 +21,20 @@ const Plans = () => {
         const diffTime = Math.abs(end - start)
         calculatedDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1
       }
-
-      const count = data.travelers || 1;
-      const mockList = Array.from({ length: count }, (_, i) => ({ name: `T${i + 1}` }));
-
+      const count = data.travelers || 1
+      const mockList = Array.from({ length: count }, (_, i) => ({ name: `T${i + 1}` }))
       setTripInfo({
         travelers: count,
         destination: data.destination || 'your destination',
         days: calculatedDays,
         mockTravelersList: mockList
       })
+    }
+
+    // Load AI-generated options from sessionStorage
+    const savedOptions = sessionStorage.getItem('generatedOptions')
+    if (savedOptions) {
+      setOptions(JSON.parse(savedOptions))
     }
   }, [])
 
@@ -83,9 +88,17 @@ const Plans = () => {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6, delay: 0.3 }}
       >
-        {mockPlans.map((plan, idx) => (
-          <PlanCard key={plan.id} plan={plan} isRecommended={idx === 0} />
-        ))}
+        {options.length > 0
+          ? options.map((option, idx) => (
+            <PlanCard key={option.id} plan={option} isRecommended={idx === 0} />
+          ))
+          : (
+            // Fallback if something went wrong loading options
+            <p style={{ color: 'var(--color-text-secondary)', gridColumn: '1/-1', textAlign: 'center', padding: '3rem' }}>
+              No route options found. Please <Link to="/trip-setup">go back and try again</Link>.
+            </p>
+          )
+        }
       </motion.div>
 
       <motion.div

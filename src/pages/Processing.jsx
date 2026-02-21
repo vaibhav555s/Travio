@@ -4,57 +4,122 @@ import { motion } from 'framer-motion'
 import './Processing.css'
 
 const messages = [
-  'Reading your crew profiles...',
-  'Mapping destinations...',
-  'Balancing energy levels...',
-  'Calculating the perfect pace...',
+  'Reading your trip preferences...',
+  'Consulting Gemini AI...',
+  'Mapping destination highlights...',
+  'Balancing budget and experiences...',
   'Building 3 distinct routes...',
 ]
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
 
 const Processing = () => {
   const navigate = useNavigate()
   const [messageIndex, setMessageIndex] = useState(0)
   const [progress, setProgress] = useState(0)
   const [tripInfo, setTripInfo] = useState({ travelers: 1, destination: 'your destination', days: 1 })
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     const saved = sessionStorage.getItem('tripSetupData')
+    let tripData = null
+
     if (saved) {
-      const data = JSON.parse(saved)
+      tripData = JSON.parse(saved)
       let calculatedDays = 1
-      if (data.departureDate && data.returnDate) {
-        const start = new Date(data.departureDate)
-        const end = new Date(data.returnDate)
+      if (tripData.departureDate && tripData.returnDate) {
+        const start = new Date(tripData.departureDate)
+        const end = new Date(tripData.returnDate)
         const diffTime = Math.abs(end - start)
         calculatedDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1
       }
       setTripInfo({
-        travelers: data.travelers || 1,
-        destination: data.destination || 'your destination',
+        travelers: tripData.travelers || 1,
+        destination: tripData.destination || 'your destination',
         days: calculatedDays
       })
     }
+
+    // Cycle through messages every 700ms
     const messageTimer = setInterval(() => {
       setMessageIndex((prev) => (prev + 1) % messages.length)
     }, 700)
 
+    // Animate progress bar up to ~90% while waiting for API
     const progressTimer = setInterval(() => {
       setProgress((prev) => {
-        if (prev >= 100) return 100
-        return prev + (100 / 35) // Reaches 100 in 3.5 seconds
+        if (prev >= 90) return 90
+        return prev + 1.5
       })
     }, 100)
 
-    const navigationTimer = setTimeout(() => {
-      navigate('/plans')
-    }, 3500)
+    // Call Gemini via backend
+    const fetchOptions = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/generate-options`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(tripData || {}),
+        })
+
+        if (!response.ok) {
+          const err = await response.json()
+          throw new Error(err.error || 'Server error')
+        }
+
+        const data = await response.json()
+
+        // Store AI-generated options for Plans page
+        sessionStorage.setItem('generatedOptions', JSON.stringify(data.options || []))
+
+        // Complete progress bar then navigate
+        setProgress(100)
+        setTimeout(() => navigate('/plans'), 500)
+      } catch (err) {
+        console.error('Processing error:', err)
+        setError(err.message || 'Something went wrong. Please try again.')
+        clearInterval(progressTimer)
+      }
+    }
+
+    fetchOptions()
 
     return () => {
       clearInterval(messageTimer)
       clearInterval(progressTimer)
-      clearTimeout(navigationTimer)
     }
   }, [navigate])
+
+  if (error) {
+    return (
+      <div className="processing-page">
+        <div className="processing-background" />
+        <div className="processing-glow" />
+        <motion.div
+          className="processing-content"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
+        >
+          <div style={{ textAlign: 'center', color: 'white' }}>
+            <p style={{ fontSize: '3rem', marginBottom: '1rem' }}>⚠️</p>
+            <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Oops! Something went wrong</h2>
+            <p style={{ opacity: 0.8, marginBottom: '1.5rem', maxWidth: '400px' }}>{error}</p>
+            <button
+              onClick={() => navigate('/setup')}
+              style={{
+                background: 'var(--color-accent)', color: 'white',
+                border: 'none', borderRadius: '100px', padding: '12px 24px',
+                fontSize: '1rem', cursor: 'pointer'
+              }}
+            >
+              ← Back to Trip Setup
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    )
+  }
 
   return (
     <div className="processing-page">
