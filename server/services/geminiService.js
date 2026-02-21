@@ -29,7 +29,7 @@ async function withRetry(fn, maxAttempts = 3, baseDelayMs = 5000) {
 }
 
 /** Get model — try gemini-2.0-flash first, fall back to gemini-1.5-flash */
-function getModel(modelName = 'gemini-2.5-flash') {
+function getModel(modelName = 'gemini-2.5-flash-lite') {
   return genAI.getGenerativeModel({ model: modelName })
 }
 
@@ -37,17 +37,27 @@ function getModel(modelName = 'gemini-2.5-flash') {
  * Step 1 – Generate 3 distinct route options for the given trip parameters.
  */
 export async function generateOptions(tripData) {
-  const { destination, departureDate, returnDate, budget, travelers, vibes = [] } = tripData
+  const { source, destination, departureDate, returnDate, budget, travelers, vibes = [], crewProfiles = [] } = tripData
+
+  // Format crew profiles for the prompt
+  const crewSummary = crewProfiles.length > 0
+    ? crewProfiles.map((t, i) =>
+      `  Traveler ${i + 1}: ${t.name || `T${i + 1}`}, Age: ${t.age || 'unknown'}, Interests: ${(t.interests || []).join(', ') || 'none specified'}`
+    ).join('\n')
+    : `  ${travelers} traveler(s), no detailed profiles`
 
   const prompt = `You are an expert Indian travel planner. Analyze the following trip parameters and generate exactly 3 distinct route options.
 
 Trip Parameters:
+- Starting From: ${source || 'Not specified'}
 - Destination: ${destination}
 - Departure: ${departureDate}
 - Return: ${returnDate}
 - Budget (total in INR): Rs.${budget}
 - Number of travelers: ${travelers}
 - Travel vibes/interests: ${vibes.join(', ') || 'General'}
+- Crew Profiles:
+${crewSummary}
 
 Return ONLY valid JSON (no markdown, no explanation) with this exact structure:
 {
@@ -88,7 +98,7 @@ Rules: recommended = balanced; high_energy = adventure, up to 120% budget; budge
  * Step 2 – Generate full day-wise itinerary for a chosen route option.
  */
 export async function generateItinerary(selectedOptionId, tripData) {
-  const { destination, departureDate, returnDate, budget, travelers, vibes = [] } = tripData
+  const { source, destination, departureDate, returnDate, budget, travelers, vibes = [] } = tripData
 
   const start = new Date(departureDate)
   const end = new Date(returnDate)
@@ -104,6 +114,7 @@ export async function generateItinerary(selectedOptionId, tripData) {
   const prompt = `You are an expert Indian travel planner. Generate a detailed ${days}-day itinerary.
 
 Trip Parameters:
+- Starting From: ${source || 'Not specified'}
 - Destination: ${destination}
 - Departure: ${departureDate}
 - Return: ${returnDate}

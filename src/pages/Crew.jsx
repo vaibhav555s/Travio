@@ -3,56 +3,59 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
 import TravelerCard from '../components/TravelerCard'
 import { ArrowRightIcon } from '../components/SVGIcons'
+import { useAuth } from '../context/AuthContext'
 import './Crew.css'
+
+const DEFAULT_TRAVELER = (id, name) => ({
+  id,
+  name,
+  age: '',
+  interests: [],
+})
 
 const Crew = () => {
   const navigate = useNavigate()
+  const { user } = useAuth()
 
-  const getInitialCount = () => {
-    const saved = sessionStorage.getItem('tripSetupData')
-    if (saved) {
-      const parsed = JSON.parse(saved)
-      return parsed.travelers || 2
+  // ── Consistency: restore full traveler list from sessionStorage ──
+  const [travelers, setTravelers] = useState(() => {
+    // 1. Try to restore saved crew details
+    const savedCrew = sessionStorage.getItem('crewData')
+    if (savedCrew) {
+      try {
+        const parsed = JSON.parse(savedCrew)
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed
+      } catch (_) { }
     }
-    return 2
-  }
 
-  const initialCount = getInitialCount()
+    // 2. Fall back to count from tripSetupData, seed traveler 1 with logged-in user name
+    const savedTrip = sessionStorage.getItem('tripSetupData')
+    const count = savedTrip ? (JSON.parse(savedTrip).travelers || 2) : 2
+    const userName = user?.name || ''
+    return Array.from({ length: count }, (_, i) =>
+      DEFAULT_TRAVELER(i + 1, i === 0 && userName ? userName : `Traveler ${i + 1}`)
+    )
+  })
 
-  const [travelers, setTravelers] = useState(
-    Array.from({ length: initialCount }, (_, i) => ({
-      id: i + 1,
-      name: `Traveler ${i + 1}`,
-      energyLevel: 3,
-      budgetType: 'Moderate',
-      interests: [],
-    }))
-  )
-
+  // ── Consistency: persist full crew to sessionStorage on every change ──
   useEffect(() => {
-    const saved = sessionStorage.getItem('tripSetupData')
-    if (saved) {
-      const parsed = JSON.parse(saved)
+    sessionStorage.setItem('crewData', JSON.stringify(travelers))
+
+    // Also keep traveler count in tripSetupData so TripSetup stepper stays accurate
+    const savedTrip = sessionStorage.getItem('tripSetupData')
+    if (savedTrip) {
+      const parsed = JSON.parse(savedTrip)
       if (parsed.travelers !== travelers.length) {
         sessionStorage.setItem('tripSetupData', JSON.stringify({ ...parsed, travelers: travelers.length }))
         window.dispatchEvent(new Event('tripDataUpdated'))
       }
     }
-  }, [travelers.length])
+  }, [travelers])
 
   const handleAddTraveler = () => {
     if (travelers.length < 12) {
       const newId = Math.max(...travelers.map((t) => t.id), 0) + 1
-      setTravelers([
-        ...travelers,
-        {
-          id: newId,
-          name: `Traveler ${travelers.length + 1}`,
-          energyLevel: 3,
-          budgetType: 'Moderate',
-          interests: [],
-        },
-      ])
+      setTravelers([...travelers, DEFAULT_TRAVELER(newId, `Traveler ${travelers.length + 1}`)])
     }
   }
 
@@ -68,6 +71,8 @@ const Crew = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    // Save final state explicitly before navigating
+    sessionStorage.setItem('crewData', JSON.stringify(travelers))
     console.log('Crew data:', travelers)
     navigate('/processing')
   }
@@ -122,7 +127,7 @@ const Crew = () => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <AnimatePresence mode="popLayout">
+            <AnimatePresence>
               {travelers.map((traveler, index) => (
                 <TravelerCard
                   key={traveler.id}
@@ -174,10 +179,7 @@ const Crew = () => {
             </button>
             <p className="form-caption">Takes 4–8 seconds</p>
 
-            <Link
-              to="/setup"
-              className="back-link text-body-sm"
-            >
+            <Link to="/setup" className="back-link text-body-sm">
               ← Back to trip details
             </Link>
           </motion.div>

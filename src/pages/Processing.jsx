@@ -53,6 +53,10 @@ const Processing = () => {
       })
     }, 100)
 
+    // Merge crew details so Gemini knows each traveler's profile
+    const savedCrew = sessionStorage.getItem('crewData')
+    const crewData = savedCrew ? JSON.parse(savedCrew) : []
+
     // Call Gemini via backend
     // Processing.jsx - update fetchOptions function
 const fetchOptions = async () => {
