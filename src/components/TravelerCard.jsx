@@ -8,14 +8,18 @@ const avatarColors = ['#E8631A', '#4A9EDB', '#E8A21A', '#6B9E4A', '#C44A6B', '#7
 
 const TravelerCard = ({ traveler, index, onUpdate, onRemove }) => {
   const [editingName, setEditingName] = useState(false)
-  const [name, setName] = useState(traveler.name || `Traveler ${index + 1}`)
+  const [customName, setCustomName] = useState(traveler.name && !traveler.name.startsWith('Traveler ') ? traveler.name : '')
   const avatarColor = avatarColors[index % avatarColors.length]
+  const displayName = customName || `Traveler ${index + 1}`
 
   const handleNameSave = () => {
-    if (name.trim()) {
-      onUpdate({ ...traveler, name })
-      setEditingName(false)
+    if (customName.trim()) {
+      onUpdate({ ...traveler, name: customName })
+    } else {
+      // If cleared, revert to dynamic naming
+      onUpdate({ ...traveler, name: `Traveler ${index + 1}` })
     }
+    setEditingName(false)
   }
 
   const handleEnergyLevel = (level) => {
@@ -34,12 +38,14 @@ const TravelerCard = ({ traveler, index, onUpdate, onRemove }) => {
     onUpdate({ ...traveler, interests: newInterests })
   }
 
-  const initials = name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2)
+  const initials = customName
+    ? customName
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2)
+    : `T${index + 1}`
 
   return (
     <motion.div
@@ -58,21 +64,21 @@ const TravelerCard = ({ traveler, index, onUpdate, onRemove }) => {
           {editingName ? (
             <input
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={customName}
+              onChange={(e) => setCustomName(e.target.value)}
               onBlur={handleNameSave}
               onKeyDown={(e) => e.key === 'Enter' && handleNameSave()}
               autoFocus
-              placeholder="Traveler name"
+              placeholder={`Traveler ${index + 1}`}
               className="name-input"
             />
           ) : (
             <div className="name-display" onClick={() => setEditingName(true)}>
-              {name}
+              {displayName}
             </div>
           )}
         </div>
-        <button className="remove-btn" onClick={() => onRemove(traveler.id)}>
+        <button type="button" className="remove-btn" onClick={() => onRemove(traveler.id)}>
           ×
         </button>
       </div>
@@ -84,6 +90,7 @@ const TravelerCard = ({ traveler, index, onUpdate, onRemove }) => {
         <div className="energy-buttons">
           {[1, 2, 3, 4, 5].map((level) => (
             <motion.button
+              type="button"
               key={level}
               className={`energy-btn ${traveler.energyLevel === level ? 'active' : ''}`}
               onClick={() => handleEnergyLevel(level)}
@@ -100,6 +107,7 @@ const TravelerCard = ({ traveler, index, onUpdate, onRemove }) => {
         <div className="budget-chips">
           {budgetTypes.map((type) => (
             <motion.button
+              type="button"
               key={type}
               className={`budget-chip ${traveler.budgetType === type ? 'active' : ''}`}
               onClick={() => handleBudgetType(type)}
@@ -116,6 +124,7 @@ const TravelerCard = ({ traveler, index, onUpdate, onRemove }) => {
         <div className="interests-chips">
           {interests.map((interest) => (
             <motion.button
+              type="button"
               key={interest}
               className={`interest-chip ${(traveler.interests || []).includes(interest) ? 'active' : ''}`}
               onClick={() => handleInterests(interest)}
