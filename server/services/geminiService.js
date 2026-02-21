@@ -1,13 +1,30 @@
-import { GoogleGenerativeAI } from '@google/generative-ai'
+import OpenAI from 'openai'
 import dotenv from 'dotenv'
 dotenv.config()
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
+const openai = new OpenAI({
+  apiKey: process.env.GROK_API_KEY, /* actually a Groq key (gsk_...) */
+  baseURL: 'https://api.groq.com/openai/v1',
+})
 
-/** Strip markdown code fences Gemini sometimes wraps around JSON */
+const GROK_MODEL = 'llama-3.3-70b-versatile'
+
 function extractJSON(text) {
-  const clean = text.replace(/```(?:json)?\n?/gi, '').replace(/```/g, '').trim()
-  return JSON.parse(clean)
+  try {
+    // Strip markdown code fences if present
+    let clean = text.replace(/```(?:json)?\n?/gi, '').replace(/```/g, '').trim()
+    // Find the first { and last } to ensure we only parse the JSON object
+    const startIndex = clean.indexOf('{')
+    const endIndex = clean.lastIndexOf('}')
+    if (startIndex !== -1 && endIndex !== -1) {
+      clean = clean.substring(startIndex, endIndex + 1)
+    }
+    return JSON.parse(clean)
+  } catch (err) {
+    console.error("Failed to parse JSON:", err.message)
+    console.error("Raw text was:", text)
+    throw new Error("Llama output was not valid JSON")
+  }
 }
 
 /** Retry a function up to maxAttempts times with exponential backoff */
@@ -28,10 +45,7 @@ async function withRetry(fn, maxAttempts = 3, baseDelayMs = 5000) {
   throw lastError
 }
 
-/** Get model — try gemini-2.0-flash first, fall back to gemini-1.5-flash */
-function getModel(modelName = 'gemini-2.5-flash-lite') {
-  return genAI.getGenerativeModel({ model: modelName })
-}
+
 
 /**
  * Step 1 – Generate 3 distinct route options for the given trip parameters.
@@ -85,12 +99,20 @@ Return ONLY valid JSON (no markdown, no explanation) with this exact structure:
 
 Rules: recommended = balanced; high_energy = adventure, up to 120% budget; budget_friendly = under 70% budget. All highlights must be real activities at ${destination}.`
 
-  const model = getModel()
   return withRetry(async () => {
-    const result = await model.generateContent(prompt)
-    const text = result.response.text()
-    console.log('[geminiService] Raw options response (first 300):', text.substring(0, 300))
-    return extractJSON(text)
+    try {
+      const completion = await openai.chat.completions.create({
+        model: GROK_MODEL,
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.7,
+      })
+      const text = completion.choices[0].message.content
+      console.log('[grokService] Raw options response (first 300):', text.substring(0, 300))
+      return extractJSON(text)
+    } catch (err) {
+      console.error('[grokService] API Error:', err.response?.data || err.message)
+      throw err
+    }
   })
 }
 
@@ -146,11 +168,41 @@ Return ONLY valid JSON (no markdown, no explanation) with this exact structure:
 
 Rules: Include exactly ${days} day objects. Each day: 3-5 activities, real 24h times. Costs in INR using Rs. symbol. estimatedTotalBudget = total for all ${travelers} travelers. travelTips must be specific to ${destination}.`
 
-  const model = getModel()
   return withRetry(async () => {
-    const result = await model.generateContent(prompt)
-    const text = result.response.text()
-    console.log('[geminiService] Raw itinerary response (first 300):', text.substring(0, 300))
+    const completion = await openai.chat.completions.create({
+      model: GROK_MODEL,
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.7,
+    })
+    const text = completion.choices[0].message.content
+    console.log('[grokService] Raw itinerary response (first 300):', text.substring(0, 300))
+    return extractJSON(text)
+  })
+}
+
+/** Tweak an existing itinerary based on a user prompt */
+export async function refineItinerary(plan, userRequest) {
+  const prompt = `You are an expert Indian travel planner. The user wants to tweak their existing itinerary.
+  
+Original Plan:
+${JSON.stringify(plan, null, 2)}
+
+User Request: "${userRequest}"
+
+Please modify the Original Plan to accommodate the User Request. Keep the EXACT same JSON structure (tripSummary, estimatedTotalBudget, dailyPlan / days, travelTips), but update the days and activities as requested. 
+
+Also add a new root-level string property called "aiNote" briefly explaining what you changed (e.g. "I replaced the morning hike with a yoga session on Day 2.").
+
+Return ONLY valid JSON (no markdown, no conversation).`
+
+  return withRetry(async () => {
+    const completion = await openai.chat.completions.create({
+      model: GROK_MODEL,
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.7,
+    })
+    const text = completion.choices[0].message.content
+    console.log('[grokService] Raw refine response (first 300):', text.substring(0, 300))
     return extractJSON(text)
   })
 }

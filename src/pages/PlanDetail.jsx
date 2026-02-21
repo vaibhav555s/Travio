@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import ActivityCard from '../components/ActivityCard'
 import WhatIfDrawer from '../components/WhatIfDrawer'
+import MetricBar from '../components/MetricBar'
 import './PlanDetail.css'
 
 const dayThemes = [
@@ -16,7 +17,11 @@ const dayThemes = [
 export default function PlanDetail() {
   const { planId } = useParams()
   const navigate = useNavigate()
-  const originalPlan = mockPlans.find(p => p.id === planId) || mockPlans[0]
+
+  // 1. Get the high-level selected option
+  const savedOptions = sessionStorage.getItem('generatedOptions')
+  const options = savedOptions ? JSON.parse(savedOptions) : []
+  const originalPlan = options.find(p => p.id === planId) || options[0]
 
   const [itinerary, setItinerary] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -24,32 +29,88 @@ export default function PlanDetail() {
   const [selectedDay, setSelectedDay] = useState(1)
   const [showWhatIf, setShowWhatIf] = useState(false)
 
+  // 2. Fetch full day-by-day plan on mount
+  useEffect(() => {
+    async function fetchFullPlan() {
+      if (!originalPlan) {
+        setError("Plan not found. Please regenerate.")
+        setLoading(false)
+        return
+      }
+
+      try {
+        const savedTrip = sessionStorage.getItem('tripSetupData')
+        let tripData = {}
+        if (savedTrip && savedTrip !== 'undefined') {
+          tripData = JSON.parse(savedTrip)
+        }
+
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+        const res = await fetch(`${apiUrl}/api/generate-itinerary`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            selectedOptionId: originalPlan.id,
+            originalTripData: tripData,
+          }),
+        })
+
+        if (!res.ok) {
+          const errData = await res.json()
+          throw new Error(errData.error || 'Failed to generate itinerary')
+        }
+
+        const data = await res.json()
+
+        // 3. Map the AI backend response to the frontend structure
+        const fullPlan = {
+          ...originalPlan,
+          tagline: data.tripSummary || originalPlan.shortDescription,
+          totalCost: data.estimatedTotalBudget || originalPlan.price || 'Rs. 25,000',
+          days: data.dailyPlan || data.itinerary || data.days || data.daily_plan || [],
+          travelTips: data.travelTips || [],
+          photo: originalPlan.photo || 'https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=2952&auto=format&fit=crop', // fallback
+          // Mock metrics since AI doesn't return them yet
+          metrics: { budget: 65, energy: 80, experience: 90, regretRisk: 10 }
+        }
+
+        setItinerary(fullPlan)
+      } catch (err) {
+        console.error("Itinerary fetch error:", err)
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchFullPlan()
+  }, [originalPlan?.id])
+
   // Refinement state
   const [editPrompt, setEditPrompt] = useState('')
   const [isRefining, setIsRefining] = useState(false)
   const [refinedPlan, setRefinedPlan] = useState(null)
   const [refineError, setRefineError] = useState('')
 
-  const plan = refinedPlan || originalPlan
-  const currentDayData = plan.days.find(d => d.day === selectedDay) || plan.days[0]
-  const totalPeople = 4
-  const dayTheme = dayThemes[(selectedDay - 1) % dayThemes.length]
-
   const handleRefine = async () => {
     if (!editPrompt.trim()) return
     setIsRefining(true)
     setRefineError('')
+
+    // We must send the full detailed plan (with days), not just the shallow originalPlan
+    const planToRefine = refinedPlan || itinerary || originalPlan
+
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000'
       const res = await fetch(`${apiUrl}/api/itinerary/refine`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan: originalPlan, userRequest: editPrompt }),
+        body: JSON.stringify({ plan: planToRefine, userRequest: editPrompt }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Something went wrong.')
       setRefinedPlan(data.refinedPlan)
-      setSelectedDay(data.refinedPlan.days[0]?.day || 1)
+      setSelectedDay(data.refinedPlan.days?.[0]?.day || 1)
     } catch (err) {
       setRefineError(err.message)
     } finally {
@@ -63,6 +124,37 @@ export default function PlanDetail() {
     setRefineError('')
     setSelectedDay(1)
   }
+
+  // Render Loader
+  if (loading) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F9FAFB', flexDirection: 'column', gap: '20px' }}>
+        <div style={{ width: '50px', height: '50px', border: '4px solid #F59E0B', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+        <p style={{ color: '#4B5563', fontSize: '1.2rem', fontWeight: 500, fontFamily: 'Inter, sans-serif' }}>Crafting your day-by-day itinerary...</p>
+        <style>{`@keyframes spin { 100% { transform: rotate(360deg); } }`}</style>
+      </div>
+    )
+  }
+
+  // Render Error
+  if (error) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#FEF2F2', padding: '20px' }}>
+        <div style={{ textAlign: 'center' }}>
+          <h2 style={{ color: '#DC2626', marginBottom: '10px' }}>Oops! Something went wrong</h2>
+          <p style={{ color: '#7F1D1D', marginBottom: '20px' }}>{error}</p>
+          <button onClick={() => navigate('/plans')} style={{ background: '#DC2626', color: 'white', padding: '10px 20px', borderRadius: '8px', border: 'none', cursor: 'pointer' }}>Go Back</button>
+        </div>
+      </div>
+    )
+  }
+
+  const plan = refinedPlan || itinerary || originalPlan
+
+  // Safe default for currentDayData since AI might format things differently
+  const currentDayData = plan?.days?.find(d => d.day == selectedDay) || plan?.days?.[0] || { activities: [] }
+  const totalPeople = 4
+  const dayTheme = dayThemes[(selectedDay - 1) % dayThemes.length]
 
   return (
     <motion.div
@@ -125,17 +217,18 @@ export default function PlanDetail() {
             <div className="editorial-day-nav">
               <span className="edn-label">Daily Itinerary</span>
               <div className="edn-tabs">
-                {plan.days.map((day) => {
-                  const isActive = selectedDay === day.day
+                {plan?.days?.map((day, idx) => {
+                  const dayNum = day.day || (idx + 1) // fallback if AI forgets the day property
+                  const isActive = selectedDay == dayNum
                   return (
                     <motion.button
-                      key={day.day}
+                      key={idx}
                       className={`edn-tab ${isActive ? 'active' : ''}`}
-                      onClick={() => setSelectedDay(day.day)}
+                      onClick={() => setSelectedDay(dayNum)}
                       whileHover={{ y: -2 }}
                       whileTap={{ scale: 0.95 }}
                     >
-                      {day.day < 10 ? `0${day.day}` : day.day}
+                      {dayNum < 10 ? `0${dayNum}` : dayNum}
                     </motion.button>
                   )
                 })}
@@ -172,25 +265,37 @@ export default function PlanDetail() {
                 exit={{ opacity: 0, x: -16 }}
                 transition={{ duration: 0.32 }}
               >
-                {currentDayData.activities.map((activity, idx) => (
-                  <ActivityCard
-                    key={idx}
-                    activity={activity}
-                    connector={idx < currentDayData.activities.length - 1}
-                    index={idx}
-                    themeGradient={dayTheme.gradient}
-                  />
-                ))}
+                {currentDayData?.activities?.map((activity, idx) => {
+                  const energyLevels = ['Low', 'Medium', 'High']
+                  return (
+                    <ActivityCard
+                      key={idx}
+                      activity={{
+                        time: activity.time,
+                        name: activity.activity || activity.title || activity.name,
+                        description: activity.location || activity.description,
+                        cost: activity.costEstimate || activity.cost || 'Free',
+                        energy: activity.energy || energyLevels[idx % 3], // fallback if AI skips energy
+                        type: 'activity'
+                      }}
+                      connector={idx < currentDayData.activities.length - 1}
+                      index={idx}
+                      themeGradient={dayTheme.gradient}
+                    />
+                  )
+                })}
 
                 {/* AI Note */}
-                <div className="pd-ai-note">
-                  <div className="pd-ai-note-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M12 2a10 10 0 110 20 10 10 0 010-20zm0 6v4m0 4h.01" />
-                    </svg>
+                {plan.aiNote && (
+                  <div className="pd-ai-note">
+                    <div className="pd-ai-note-icon">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M12 2a10 10 0 110 20 10 10 0 010-20zm0 6v4m0 4h.01" />
+                      </svg>
+                    </div>
+                    <p>{plan.aiNote}</p>
                   </div>
-                  <p>{plan.aiNote}</p>
-                </div>
+                )}
               </motion.div>
             </AnimatePresence>
           </div>
@@ -225,10 +330,10 @@ export default function PlanDetail() {
               {/* Metrics */}
               <div className="pd-section-label">TRIP PULSE</div>
               <div className="pd-metrics">
-                <MetricBar label="Budget" value={plan.metrics.budget} accent="#4facfe" delay={0} />
-                <MetricBar label="Energy" value={plan.metrics.energy} accent="#43e97b" delay={0.1} />
-                <MetricBar label="Experience" value={plan.metrics.experience} accent="#f093fb" delay={0.2} />
-                <MetricBar label="Regret Risk" value={plan.metrics.regretRisk} isRisk delay={0.3} />
+                <MetricBar label="Budget" value={plan.metrics?.budget || 65} accent="#4facfe" delay={0} />
+                <MetricBar label="Energy" value={plan.metrics?.energy || 80} accent="#43e97b" delay={0.1} />
+                <MetricBar label="Experience" value={plan.metrics?.experience || 90} accent="#f093fb" delay={0.2} />
+                <MetricBar label="Regret Risk" value={plan.metrics?.regretRisk || 10} isRisk delay={0.3} />
               </div>
 
               <div className="pd-divider" />
@@ -338,10 +443,10 @@ export default function PlanDetail() {
                   )}
                 </motion.button>
               </div>
-              </div>
+            </div>
 
             {/* Travel Tips */}
-            {itinerary.travelTips && itinerary.travelTips.length > 0 && (
+            {itinerary?.travelTips && itinerary.travelTips.length > 0 && (
               <div style={{ marginBottom: '1rem' }}>
                 <h4 style={{ fontSize: '0.75rem', letterSpacing: '0.1em', color: 'var(--color-text-secondary)', marginBottom: '0.75rem', textTransform: 'uppercase' }}>
                   Travel Tips
@@ -349,7 +454,7 @@ export default function PlanDetail() {
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   {itinerary.travelTips.map((tip, idx) => (
                     <li key={idx} style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start', fontSize: '0.875rem', color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
-                      <span style={{ color: accent, fontWeight: 'bold', flexShrink: 0 }}>✓</span>
+                      <span style={{ color: '#F59E0B', fontWeight: 'bold', flexShrink: 0 }}>✓</span>
                       {tip}
                     </li>
                   ))}
@@ -396,6 +501,6 @@ export default function PlanDetail() {
 
       <WhatIfDrawer isOpen={showWhatIf} onClose={() => setShowWhatIf(false)} />
     </motion.div>
-    
+
   )
 }

@@ -1,0 +1,31 @@
+{
+  "tagline": "A royal escape",
+  "totalCost": "Rs.35,000",
+  "aiNote": "I added more adventurous activities to the itinerary",
+  "days": [
+    {
+      "day": 1,
+      "title": "Welcome to Jaipur",
+      "activities": [
+        {
+          "time": "06:00",
+          "activity": "Hot Air Balloon Ride",
+          "location": "Jaipur Sky",
+          "costEstimate": "Rs.8,000"
+        },
+        {
+          "time": "09:00",
+          "activity": "Zip Lining",
+          "location": "Neemrana Fort",
+          "costEstimate": "Rs.2,000"
+        },
+        {
+          "time": "14:00",
+          "activity": "Desert Safari",
+          "location": "Jaipur Desert",
+          "costEstimate": "Rs.5,000"
+        }
+      ]
+    }
+  ]
+}
