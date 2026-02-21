@@ -126,15 +126,15 @@ const TripSetup = () => {
     if (!formData.returnDate) newErrors.returnDate = 'Return date is required'
     if (formData.vibes.length === 0) newErrors.vibes = 'Please select at least one trip vibe'
 
-  if (Object.keys(newErrors).length > 0) {
-    setErrors(newErrors)
-    return
-  }
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      return
+    }
 
     setErrors({})
     navigate('/crew')
+
   }
-}
 
   const progressSteps = [
     { label: 'From', completed: !!formData.source },
