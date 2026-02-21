@@ -25,19 +25,20 @@ export default function ActivityCard({ activity, index = 0, themeGradient }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
     >
-      <div className="aesthetic-act-time">
-        <span
-          className="ac-hr"
-          style={themeGradient ? {
-            backgroundImage: themeGradient,
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            color: 'transparent'
-          } : {}}
-        >
-          {hours}
-        </span>
-        <span className="ac-min">{mins}</span>
+      <div
+        className="aesthetic-act-time"
+        style={themeGradient ? {
+          backgroundImage: themeGradient,
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          color: 'transparent'
+        } : {}}
+      >
+        <div className="ac-time-wrapper">
+          <span className="ac-hr">{hours}</span>
+          <span className="ac-colon">:</span>
+          <span className="ac-min">{mins}</span>
+        </div>
       </div>
 
       <div className="aesthetic-act-card" style={{ '--act-color': theme.color }}>

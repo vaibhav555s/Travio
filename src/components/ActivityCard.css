@@ -22,34 +22,42 @@
 /* ── Editorial Time Display ── */
 .aesthetic-act-time {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: -6px;
+  justify-content: center;
+  margin-top: -2px;
   flex-shrink: 0;
-  width: 50px;
+  width: 76px;
+}
+
+.ac-time-wrapper {
+  display: flex;
+  align-items: baseline;
 }
 
 .ac-hr {
   font-family: var(--font-display);
-  font-size: 42px;
+  font-size: 38px;
   line-height: 0.8;
   color: #1c1c24;
   font-style: italic;
   font-weight: 400;
-  letter-spacing: -1px;
+  letter-spacing: -2px;
+}
+
+.ac-colon {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-style: italic;
+  font-weight: 400;
+  margin: 0 1px 0 2px;
+  position: relative;
+  top: -3px;
 }
 
 .ac-min {
-  font-family: var(--font-body);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  color: #555;
-  margin-top: 8px;
-  border-top: 1.5px solid #ddd;
-  padding-top: 4px;
-  width: 100%;
-  text-align: center;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 400;
+  font-style: italic;
 }
 
 /* ── Glassmorphism Card ── */
