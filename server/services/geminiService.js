@@ -7,23 +7,33 @@ const openai = new OpenAI({
   baseURL: 'https://api.groq.com/openai/v1',
 })
 
-const GROK_MODEL = 'llama-3.3-70b-versatile'
+const GROK_MODEL = 'llama-3.1-8b-instant'
 
 function extractJSON(text) {
   try {
     // Strip markdown code fences if present
     let clean = text.replace(/```(?:json)?\n?/gi, '').replace(/```/g, '').trim()
+
     // Find the first { and last } to ensure we only parse the JSON object
     const startIndex = clean.indexOf('{')
     const endIndex = clean.lastIndexOf('}')
-    if (startIndex !== -1 && endIndex !== -1) {
-      clean = clean.substring(startIndex, endIndex + 1)
+
+    if (startIndex === -1 || endIndex === -1) {
+      throw new Error("No JSON object found in response")
     }
+
+    clean = clean.substring(startIndex, endIndex + 1)
+
+    // Remove any trailing commas that some models add before the closing brace
+    clean = clean.replace(/,\s*([}\]])/g, '$1')
+
     return JSON.parse(clean)
   } catch (err) {
-    console.error("Failed to parse JSON:", err.message)
-    console.error("Raw text was:", text)
-    throw new Error("Llama output was not valid JSON")
+    console.error("--- JSON PARSE FAILURE ---")
+    console.error("Error:", err.message)
+    console.error("Raw Text:", text)
+    console.error("--------------------------")
+    throw new Error("AI output was not valid JSON")
   }
 }
 
@@ -104,7 +114,9 @@ Rules: recommended = balanced; high_energy = adventure, up to 120% budget; budge
       const completion = await openai.chat.completions.create({
         model: GROK_MODEL,
         messages: [{ role: 'user', content: prompt }],
-        temperature: 0.7,
+        temperature: 0.1, // Lower temperature for more consistent JSON
+        response_format: { type: 'json_object' },
+        max_tokens: 4000
       })
       const text = completion.choices[0].message.content
       console.log('[grokService] Raw options response (first 300):', text.substring(0, 300))
@@ -172,7 +184,9 @@ Rules: Include exactly ${days} day objects. Each day: 3-5 activities, real 24h t
     const completion = await openai.chat.completions.create({
       model: GROK_MODEL,
       messages: [{ role: 'user', content: prompt }],
-      temperature: 0.7,
+      temperature: 0.1,
+      response_format: { type: 'json_object' },
+      max_tokens: 6000
     })
     const text = completion.choices[0].message.content
     console.log('[grokService] Raw itinerary response (first 300):', text.substring(0, 300))
@@ -199,7 +213,9 @@ Return ONLY valid JSON (no markdown, no conversation).`
     const completion = await openai.chat.completions.create({
       model: GROK_MODEL,
       messages: [{ role: 'user', content: prompt }],
-      temperature: 0.7,
+      temperature: 0.1,
+      response_format: { type: 'json_object' },
+      max_tokens: 6000
     })
     const text = completion.choices[0].message.content
     console.log('[grokService] Raw refine response (first 300):', text.substring(0, 300))

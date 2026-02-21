@@ -1,4 +1,4 @@
-import { useState,useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import ActivityCard from '../components/ActivityCard'
 import CrewChat from '../components/CrewChat'
@@ -11,15 +11,15 @@ export default function Dashboard() {
   const [toast, setToast] = useState(null)
   const [currentDay] = useState(2)
   const [weather, setWeather] = useState(false)
-  const [plan, setPlan]         = useState(null)
-  const [loading, setLoading]   = useState(true)
+  const [plan, setPlan] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const loadDashboard = async () => {
       try {
-        const saved  = sessionStorage.getItem('tripSetupData')
+        const saved = sessionStorage.getItem('tripSetupData')
         const tripData = saved ? JSON.parse(saved) : {}
-        const token  = localStorage.getItem('accessToken')
+        const token = localStorage.getItem('accessToken')
 
         if (tripData.tripId && token) {
           const res = await fetch(
@@ -42,7 +42,7 @@ export default function Dashboard() {
   }, [])
   if (loading) return <div className="dashboard">Loading...</div>
   const activePlan = plan || mockPlans[0]
-  const currentDayData = activePlan.days?.find(d => d.day === currentDay) 
+  const currentDayData = activePlan.days?.find(d => d.day === currentDay)
     || activePlan.dailyPlan?.find(d => d.day === currentDay)
     || activePlan.days?.[0]
     || activePlan.dailyPlan?.[0]
@@ -55,7 +55,7 @@ export default function Dashboard() {
   }
 
   return (
-    
+
     <motion.div
       className="dashboard"
       initial={{ opacity: 0, y: 16 }}
@@ -71,7 +71,7 @@ export default function Dashboard() {
         </div>
         <div className="header-center">
           <span className="live-indicator">●</span>
-          <span className="header-status">LIVE · Day {currentDay} of {plan.nights}</span>
+          <span className="header-status">LIVE · Day {currentDay} of {activePlan?.nights || activePlan?.dailyPlan?.length || 0}</span>
         </div>
         <div className="header-right">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -94,13 +94,13 @@ export default function Dashboard() {
         {/* Left: Timeline */}
         <div className="dashboard-left">
           <div className="timeline-header">
-            <h2 className="timeline-title">DAY {currentDay} — CULTURE & COAST</h2>
+            <h2 className="timeline-title">DAY {currentDay} — {currentDayData?.title || 'Exploration'}</h2>
             <p className="timeline-date">Thursday, March 13, 2025</p>
           </div>
 
           <div className="activities-timeline">
             <AnimatePresence>
-              {currentDayData.activities.map((activity, idx) => {
+              {currentDayData?.activities?.map((activity, idx) => {
                 const isPast = idx < 1
                 const isCurrent = idx === 1
                 return (
@@ -109,7 +109,7 @@ export default function Dashboard() {
                       activity={activity}
                       isPast={isPast}
                       isCurrent={isCurrent}
-                      connector={idx < currentDayData.activities.length - 1}
+                      connector={idx < (currentDayData?.activities?.length - 1)}
                     />
                   </div>
                 )
