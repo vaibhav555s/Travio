@@ -8,6 +8,19 @@ import VibeChips from '../components/VibeChips'
 import { MapPinIcon, CalendarIcon, ArrowRightIcon } from '../components/SVGIcons'
 import './TripSetup.css'
 
+const majorCities = [
+  'Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Hyderabad', 'Kolkata',
+  'Pune', 'Ahmedabad', 'Jaipur', 'Surat', 'Lucknow', 'Chandigarh',
+  'Bhopal', 'Indore', 'Nagpur', 'Kochi', 'Coimbatore', 'Visakhapatnam',
+  'Guwahati', 'Bhubaneswar'
+]
+
+const popularDestinations = [
+  'Goa', 'Manali', 'Leh-Ladakh', 'Jaipur', 'Rishikesh',
+  'Udaipur', 'Coorg', 'Andaman', 'Varanasi', 'Darjeeling',
+  'Shimla', 'Ooty', 'Munnar', 'Pondicherry', 'Agra'
+]
+
 const MapModal = ({ isOpen, onClose, onSelect }) => {
   return (
     <AnimatePresence>
@@ -58,18 +71,32 @@ const MapModal = ({ isOpen, onClose, onSelect }) => {
     </AnimatePresence>
   )
 }
+
 const TripSetup = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const [errors, setErrors] = useState({})
   const [isMapOpen, setIsMapOpen] = useState(false)
+  const [isSourceFocused, setIsSourceFocused] = useState(false)
   const [isDestFocused, setIsDestFocused] = useState(false)
-  const popularDestinations = ['Goa', 'Manali', 'Leh-Ladakh', 'Jaipur', 'Rishikesh', 'Udaipur', 'Coorg', 'Andaman', 'Varanasi', 'Darjeeling']
 
+  // ── Consistency: restore saved form state from sessionStorage ──
   const [formData, setFormData] = useState(() => {
     const saved = sessionStorage.getItem('tripSetupData')
-    if (saved) return JSON.parse(saved)
+    if (saved) {
+      const parsed = JSON.parse(saved)
+      return {
+        source: parsed.source || '',
+        destination: parsed.destination || '',
+        departureDate: parsed.departureDate || '',
+        returnDate: parsed.returnDate || '',
+        budget: parsed.budget || 30000,
+        travelers: parsed.travelers || 1,
+        vibes: parsed.vibes || [],
+      }
+    }
     return {
+      source: '',
       destination: '',
       departureDate: '',
       returnDate: '',
@@ -79,7 +106,7 @@ const TripSetup = () => {
     }
   })
 
-  // Only update sessionStorage when formData changes
+  // ── Consistency: persist to sessionStorage on every change ──
   useEffect(() => {
     sessionStorage.setItem('tripSetupData', JSON.stringify(formData))
     window.dispatchEvent(new Event('tripDataUpdated'))
@@ -92,6 +119,7 @@ const TripSetup = () => {
   const handleSubmit = (e) => {
     e.preventDefault()
     const newErrors = {}
+    if (!formData.source) newErrors.source = 'Please enter your starting city'
     if (!formData.destination) newErrors.destination = 'Please enter a destination'
     if (!formData.departureDate) newErrors.departureDate = 'Departure date is required'
     if (!formData.returnDate) newErrors.returnDate = 'Return date is required'
@@ -103,11 +131,11 @@ const TripSetup = () => {
     }
 
     setErrors({})
-    console.log('Trip setup data:', formData)
     navigate('/crew')
   }
 
   const progressSteps = [
+    { label: 'From', completed: !!formData.source },
     { label: 'Destination', completed: !!formData.destination },
     { label: 'Dates', completed: !!formData.departureDate && !!formData.returnDate },
     { label: 'Budget', completed: true },
@@ -117,6 +145,14 @@ const TripSetup = () => {
 
   const completedSteps = progressSteps.filter((step) => step.completed).length
   const progressPercentage = (completedSteps / progressSteps.length) * 100
+
+  // Filter helpers
+  const filteredSources = majorCities.filter(c =>
+    c.toLowerCase().includes(formData.source.toLowerCase()) && formData.source.length > 0
+  )
+  const filteredDests = popularDestinations.filter(d =>
+    d.toLowerCase().includes(formData.destination.toLowerCase())
+  )
 
   return (
     <div className="trip-setup">
@@ -136,22 +172,23 @@ const TripSetup = () => {
           </p>
 
           <div className="progress-dots">
-            {progressSteps.map((_, idx) => {
-              const isActive = idx < completedSteps;
-              const isCurrent = idx === completedSteps - 1; // Highlight the exact current number slightly differently if desired, or just keep it solid
+            {progressSteps.map((step, idx) => {
+              const isActive = idx < completedSteps
+              const isCurrent = idx === completedSteps - 1
               return (
                 <motion.div
                   key={idx}
                   className={`dot ${isActive ? 'completed' : ''}`}
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  transition={{ delay: idx * 0.1 }}
+                  transition={{ delay: idx * 0.08 }}
                   style={isActive ? {
                     background: 'var(--color-accent)',
                     borderColor: 'var(--color-accent)',
                     color: 'white',
                     boxShadow: isCurrent ? '0 0 10px rgba(217, 119, 6, 0.5)' : 'none'
                   } : {}}
+                  title={step.label}
                 >
                   <span className="text-caption" style={{ fontWeight: 'bold' }}>{idx + 1}</span>
                 </motion.div>
@@ -194,12 +231,63 @@ const TripSetup = () => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
+
+            {/* ── SOURCE CITY ── */}
+            <div className="form-section" style={{ position: 'relative' }}>
+              <TextInput
+                label="Starting From"
+                icon={MapPinIcon}
+                placeholder="e.g., Mumbai, Delhi, Pune"
+                value={formData.source}
+                onChange={(e) => {
+                  handleInputChange('source', e.target.value)
+                  if (e.target.value) setErrors(prev => ({ ...prev, source: null }))
+                }}
+                onFocus={() => setIsSourceFocused(true)}
+                onBlur={() => setTimeout(() => setIsSourceFocused(false), 200)}
+              />
+              <AnimatePresence>
+                {isSourceFocused && filteredSources.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    style={{
+                      position: 'absolute', top: '100%', left: 0, right: 0, background: 'white',
+                      border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)',
+                      zIndex: 10, marginTop: '8px', boxShadow: 'var(--shadow-lg)',
+                      maxHeight: '200px', overflowY: 'auto'
+                    }}
+                  >
+                    {filteredSources.map((city) => (
+                      <div
+                        key={city}
+                        onMouseDown={(e) => {
+                          e.preventDefault()
+                          handleInputChange('source', city)
+                          setIsSourceFocused(false)
+                          setErrors(prev => ({ ...prev, source: null }))
+                        }}
+                        style={{ padding: '12px 16px', cursor: 'pointer', borderBottom: '1px solid var(--color-border)', transition: 'background 0.2s' }}
+                        onMouseEnter={(e) => e.target.style.background = 'var(--color-surface)'}
+                        onMouseLeave={(e) => e.target.style.background = 'transparent'}
+                      >
+                        📍 {city}
+                      </div>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              {errors.source && <p className="error-text" style={{ color: 'var(--color-error)', marginTop: '4px', fontSize: '0.875rem' }}>{errors.source}</p>}
+            </div>
+
+            {/* ── DESTINATION ── */}
             <div className="form-section" style={{ position: 'relative' }}>
               <TextInput
                 label="Destination"
                 icon={MapPinIcon}
                 onIconClick={() => setIsMapOpen(true)}
-                placeholder="e.g., Mumbai to Goa"
+                placeholder="e.g., Goa, Manali, Coorg"
                 value={formData.destination}
                 onChange={(e) => handleInputChange('destination', e.target.value)}
                 onFocus={() => setIsDestFocused(true)}
@@ -218,20 +306,20 @@ const TripSetup = () => {
                       maxHeight: '200px', overflowY: 'auto'
                     }}
                   >
-                    {popularDestinations.filter(d => d.toLowerCase().includes(formData.destination.toLowerCase())).map((dest) => (
+                    {filteredDests.map((dest) => (
                       <div
                         key={dest}
                         onMouseDown={(e) => {
-                          e.preventDefault();
-                          handleInputChange('destination', dest);
-                          setIsDestFocused(false);
-                          setErrors(prev => ({ ...prev, destination: null }));
+                          e.preventDefault()
+                          handleInputChange('destination', dest)
+                          setIsDestFocused(false)
+                          setErrors(prev => ({ ...prev, destination: null }))
                         }}
                         style={{ padding: '12px 16px', cursor: 'pointer', borderBottom: '1px solid var(--color-border)', transition: 'background 0.2s' }}
                         onMouseEnter={(e) => e.target.style.background = 'var(--color-surface)'}
                         onMouseLeave={(e) => e.target.style.background = 'transparent'}
                       >
-                        {dest}
+                        🏕️ {dest}
                       </div>
                     ))}
                   </motion.div>
@@ -240,6 +328,7 @@ const TripSetup = () => {
               {errors.destination && <p className="error-text" style={{ color: 'var(--color-error)', marginTop: '4px', fontSize: '0.875rem' }}>{errors.destination}</p>}
             </div>
 
+            {/* ── DATES ── */}
             <div className="form-section">
               <h3 className="text-title form-section-title">Trip Dates</h3>
               <div className="dates-grid">
@@ -248,8 +337,8 @@ const TripSetup = () => {
                     label="Departure Date"
                     value={formData.departureDate}
                     onChange={(e) => {
-                      handleInputChange('departureDate', e.target.value);
-                      if (e.target.value) setErrors(prev => ({ ...prev, departureDate: null }));
+                      handleInputChange('departureDate', e.target.value)
+                      if (e.target.value) setErrors(prev => ({ ...prev, departureDate: null }))
                     }}
                   />
                   {errors.departureDate && <p className="error-text" style={{ color: 'var(--color-error)', marginTop: '4px', fontSize: '0.875rem' }}>{errors.departureDate}</p>}
@@ -259,8 +348,8 @@ const TripSetup = () => {
                     label="Return Date"
                     value={formData.returnDate}
                     onChange={(e) => {
-                      handleInputChange('returnDate', e.target.value);
-                      if (e.target.value) setErrors(prev => ({ ...prev, returnDate: null }));
+                      handleInputChange('returnDate', e.target.value)
+                      if (e.target.value) setErrors(prev => ({ ...prev, returnDate: null }))
                     }}
                   />
                   {errors.returnDate && <p className="error-text" style={{ color: 'var(--color-error)', marginTop: '4px', fontSize: '0.875rem' }}>{errors.returnDate}</p>}
@@ -309,9 +398,9 @@ const TripSetup = () => {
         isOpen={isMapOpen}
         onClose={() => setIsMapOpen(false)}
         onSelect={(loc) => {
-          handleInputChange('destination', loc);
-          setIsMapOpen(false);
-          setErrors(prev => ({ ...prev, destination: null }));
+          handleInputChange('destination', loc)
+          setIsMapOpen(false)
+          setErrors(prev => ({ ...prev, destination: null }))
         }}
       />
     </div>
