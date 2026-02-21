@@ -1,0 +1,124 @@
+/* TripCard — premium lift */
+.trip-card {
+    background: linear-gradient(135deg, #FFF9ED, #FDF3E3);
+    border: 1.5px solid rgba(245, 158, 11, 0.2);
+    border-radius: 18px;
+    padding: 0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+}
+
+.trip-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* Left amber accent bar */
+.trip-card::before {
+    content: '';
+    display: block;
+    width: 4px;
+    flex-shrink: 0;
+    background: linear-gradient(180deg, #F59E0B, #FDBA74);
+    border-radius: 4px 0 0 4px;
+}
+
+.trip-card-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px;
+    flex: 1;
+}
+
+.trip-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.trip-card-destination {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #1a1a1a;
+    margin: 0;
+    font-family: var(--font-display, Georgia, serif);
+    line-height: 1.2;
+}
+
+.trip-badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 100px;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.trip-badge.owner {
+    background: rgba(16, 185, 129, 0.1);
+    color: #065f46;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.trip-badge.team {
+    background: rgba(59, 130, 246, 0.1);
+    color: #1e40af;
+    border: 1px solid rgba(59, 130, 246, 0.25);
+}
+
+.trip-card-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.trip-card-dates,
+.trip-card-budget {
+    font-size: 0.82rem;
+    color: #6b7280;
+    margin: 0;
+}
+
+.trip-card-budget {
+    font-weight: 700;
+    color: #E8631A;
+}
+
+.trip-card-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.trip-card-btn {
+    padding: 7px 18px;
+    border-radius: 100px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.15s, opacity 0.15s;
+    letter-spacing: 0.02em;
+}
+
+.trip-card-btn:hover {
+    opacity: 0.85;
+    transform: scale(1.04);
+}
+
+.trip-card-btn.primary {
+    background: #E8631A;
+    color: white;
+}
+
+.trip-card-btn.outline {
+    background: transparent;
+    border: 1.5px solid rgba(0, 0, 0, 0.12);
+    color: #374151;
+}
