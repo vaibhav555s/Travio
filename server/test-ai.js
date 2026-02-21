@@ -4,7 +4,7 @@ const mockTripData = {
     destination: 'Jaipur',
     departureDate: '2025-03-10',
     returnDate: '2025-03-15',
-    budget: '50000',
+    budget: '55000',
     travelers: 2,
     vibes: ['Cultural', 'Historical']
 }

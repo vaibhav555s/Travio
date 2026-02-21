@@ -38,7 +38,7 @@ function extractJSON(text) {
 }
 
 /** Retry a function up to maxAttempts times with exponential backoff */
-async function withRetry(fn, maxAttempts = 3, baseDelayMs = 5000) {
+async function withRetry(fn, maxAttempts = 3, baseDelayMs = 5500) {
   let lastError
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {

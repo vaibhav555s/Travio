@@ -7,6 +7,7 @@ import authRoutes from "./routes/auth.js";
 import itineraryRoutes from "./routes/itineraryRoutes.js";
 import tripRoutes from "./routes/trip.routes.js"
 import planRoutes from "./routes/plan.routes.js"
+import collaboratorRoutes from "./routes/collaborator.routes.js"
 import connectDB from "./config/db.js";
 
 const app = express();
@@ -24,6 +25,7 @@ app.use((req, res, next) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/itinerary", itineraryRoutes);
 app.use('/api/trips', tripRoutes);
+app.use('/api/trips', collaboratorRoutes);
 app.use('/api/plans', planRoutes);
 
 // Error handler
@@ -32,5 +34,5 @@ app.use((err, req, res, next) => {
     console.error(err);
     res.status(500).json({ error: "Internal Server Error", details: err.message });
 });
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 5500
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`))

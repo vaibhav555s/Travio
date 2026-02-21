@@ -8,7 +8,7 @@ const TripCard = ({ destination, dates, budget, badge = 'owner', teamName, onOpe
                 <div className="trip-card-top">
                     <h3 className="trip-card-destination">{destination}</h3>
                     <span className={`trip-badge ${badge}`}>
-                        {badge === 'owner' ? '🟢 Owner' : '🔵 Team'}
+                        {badge === 'owner' ? '🟢 Owner' : badge === 'collaborator' ? '🤝 Collaborator' : '🔵 Team'}
                     </span>
                 </div>
 

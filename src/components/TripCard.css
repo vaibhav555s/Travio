@@ -72,6 +72,12 @@
     border: 1px solid rgba(59, 130, 246, 0.25);
 }
 
+.trip-badge.collaborator {
+    background: rgba(232, 99, 26, 0.1);
+    color: #c05621;
+    border: 1px solid rgba(232, 99, 26, 0.25);
+}
+
 .trip-card-meta {
     display: flex;
     flex-direction: column;

@@ -494,6 +494,40 @@
   padding-bottom: 4px;
 }
 
+.pd-crew-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.pd-crew-header .pd-section-label {
+  margin-bottom: 0;
+}
+
+.pd-invite-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: linear-gradient(135deg, #f09819 0%, #E8631A 100%);
+  border: none;
+  border-radius: 100px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.18s;
+  box-shadow: 0 3px 10px rgba(232, 99, 26, 0.35);
+  letter-spacing: 0.01em;
+}
+
+.pd-invite-btn:hover {
+  box-shadow: 0 5px 16px rgba(232, 99, 26, 0.5);
+  transform: translateY(-1px);
+}
+
 .pd-avatars {
   display: flex;
   align-items: center;
