@@ -1,366 +1,633 @@
-/* UserDashboard — warm premium aesthetic */
-.user-dashboard {
+/* ═══════════════════════════════════════════════════
+   USER DASHBOARD — premium travel aesthetic
+═══════════════════════════════════════════════════ */
+
+/* ── Page wrapper ─────────────────────── */
+.ud-page {
     min-height: 100vh;
-    background-color: #FAF8F3;
-    padding: 100px 0 60px;
+    background: #F7F5F0;
 }
 
+/* ── Main container (below hero) ──────── */
 .ud-container {
-    max-width: 1100px;
+    max-width: 1140px;
     margin: 0 auto;
-    padding: 0 24px;
+    padding: 0 24px 80px;
     display: flex;
     flex-direction: column;
-    gap: 52px;
+    gap: 48px;
 }
 
-/* Welcome header + amber underline accent */
-.ud-header {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.ud-eyebrow {
-    font-size: 0.7rem;
-    font-weight: 800;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: #F59E0B;
-    margin: 0;
-}
-
-.ud-greeting {
-    font-size: clamp(1.9rem, 4vw, 2.8rem);
-    font-weight: 800;
-    color: #1a1a1a;
-    margin: 0;
-    line-height: 1.1;
-    font-family: var(--font-display, Georgia, serif);
-}
-
-.ud-subtitle {
-    font-size: 1rem;
-    color: #6b7280;
-    margin: 0;
-}
-
-.ud-header-divider {
-    width: 56px;
-    height: 3px;
-    background: linear-gradient(90deg, #F59E0B, #FDBA74);
-    border-radius: 4px;
-    margin-top: 4px;
-}
-
-/* Section label */
-.ud-section-title {
-    font-size: 0.7rem;
-    font-weight: 800;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: #9ca3af;
-    margin: 0 0 16px;
-}
-
-/* Upcoming trip card — cinematic depth */
-.ud-upcoming-card {
-    background: linear-gradient(135deg, #FFF9ED, #FDF3E3);
-    border: 1.5px solid rgba(245, 158, 11, 0.22);
-    border-radius: 22px;
-    padding: 30px 32px;
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.07), 0 1px 4px rgba(245, 158, 11, 0.1);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 24px;
-    flex-wrap: wrap;
+/* ═══════════════════════════════════════
+   HERO STRIP
+═══════════════════════════════════════ */
+.ud-hero {
     position: relative;
+    background: #0f0f0f;
+    padding: 80px 0 72px;
     overflow: hidden;
+    margin-bottom: 0;
 }
 
-/* Subtle grain texture */
-.ud-upcoming-card::after {
-    content: '';
+.ud-hero-orb {
     position: absolute;
-    inset: 0;
-    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    border-radius: 50%;
+    filter: blur(80px);
     pointer-events: none;
 }
 
-.ud-upcoming-left {
+.ud-hero-orb--a {
+    width: 480px;
+    height: 480px;
+    background: radial-gradient(circle, rgba(232, 99, 26, 0.30) 0%, transparent 70%);
+    bottom: -120px;
+    left: -80px;
+}
+
+.ud-hero-orb--b {
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(245, 158, 11, 0.18) 0%, transparent 70%);
+    top: -60px;
+    right: -60px;
+}
+
+.ud-hero-inner {
+    position: relative;
+    z-index: 2;
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.ud-hero-text {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
-.ud-upcoming-dest {
-    font-size: 1.7rem;
+.ud-hero-eyebrow {
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #FDE68A;
+    margin: 0;
+}
+
+.ud-hero-greeting {
+    font-family: var(--font-display, 'Instrument Serif', Georgia, serif);
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 400;
+    color: white;
+    margin: 0;
+    line-height: 1.1;
+}
+
+.ud-hero-sub {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0;
+}
+
+.ud-hero-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px;
+    background: linear-gradient(135deg, #F59E0B, #E8631A);
+    color: white;
+    border-radius: 100px;
+    font-weight: 700;
+    font-size: 0.92rem;
+    text-decoration: none;
+    white-space: nowrap;
+    box-shadow: 0 6px 24px rgba(232, 99, 26, 0.45);
+    transition: all 0.22s ease;
+}
+
+.ud-hero-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 36px rgba(232, 99, 26, 0.55);
+}
+
+/* ═══════════════════════════════════════
+   STATS ROW
+═══════════════════════════════════════ */
+.ud-stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-top: -28px;
+    /* pull up into hero */
+}
+
+.ud-stat-card {
+    background: white;
+    border-radius: 18px;
+    padding: 22px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    cursor: default;
+    transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.ud-stat-card:hover {
+    box-shadow: 0 10px 36px rgba(0, 0, 0, 0.12);
+    border-color: rgba(245, 158, 11, 0.2);
+}
+
+.ud-stat-icon {
+    font-size: 1.4rem;
+    line-height: 1;
+}
+
+.ud-stat-num {
+    font-size: 2rem;
     font-weight: 800;
     color: #1a1a1a;
+    letter-spacing: -0.03em;
+    line-height: 1;
+}
+
+.ud-stat-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #9ca3af;
+}
+
+/* ═══════════════════════════════════════
+   UPCOMING TRIP BANNER
+═══════════════════════════════════════ */
+.ud-upcoming {
+    position: relative;
+    border-radius: 24px;
+    overflow: hidden;
+    height: 220px;
+    cursor: pointer;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.ud-upcoming-img-wrap {
+    position: absolute;
+    inset: 0;
+}
+
+.ud-upcoming-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ud-upcoming-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.35) 60%, transparent 100%);
+}
+
+.ud-upcoming-content {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 32px 36px;
+    gap: 8px;
+    z-index: 2;
+}
+
+.ud-upcoming-badge {
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    color: #86efac;
+    text-transform: uppercase;
+}
+
+.ud-upcoming-dest {
+    font-family: var(--font-display, 'Instrument Serif', Georgia, serif);
+    font-size: 1.8rem;
+    font-weight: 400;
+    color: white;
     margin: 0;
-    font-family: var(--font-display, Georgia, serif);
-    letter-spacing: -0.02em;
+    line-height: 1.15;
 }
 
 .ud-upcoming-meta {
     display: flex;
-    gap: 20px;
+    gap: 16px;
     flex-wrap: wrap;
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.7);
 }
 
-.ud-meta-item {
-    font-size: 0.875rem;
-    color: #6b7280;
-}
-
-.ud-upcoming-right {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 14px;
-}
-
-.ud-status-badge {
-    font-size: 0.72rem;
-    font-weight: 800;
-    padding: 5px 14px;
-    border-radius: 100px;
-    background: rgba(16, 185, 129, 0.1);
-    color: #065f46;
-    border: 1px solid rgba(16, 185, 129, 0.28);
-    letter-spacing: 0.08em;
-}
-
-.ud-view-btn {
-    padding: 11px 26px;
-    border-radius: 100px;
+.ud-upcoming-btn {
+    margin-top: 8px;
+    padding: 10px 22px;
     background: linear-gradient(135deg, #F59E0B, #E8631A);
     color: white;
-    font-size: 0.875rem;
-    font-weight: 700;
     border: none;
-    cursor: pointer;
-    transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s;
-    box-shadow: 0 2px 10px rgba(232, 99, 26, 0.25);
-}
-
-.ud-view-btn:hover {
-    opacity: 0.9;
-    transform: scale(1.04);
-    box-shadow: 0 6px 18px rgba(232, 99, 26, 0.35);
-}
-
-/* Recent trips horizontal scroll */
-.ud-scroll-row {
-    display: flex;
-    gap: 16px;
-    overflow-x: auto;
-    padding-bottom: 10px;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(245, 158, 11, 0.2) transparent;
-}
-
-.ud-scroll-row .trip-card {
-    min-width: 250px;
-    flex-shrink: 0;
-}
-
-/* Teams grid */
-.ud-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 16px;
-}
-
-/* Empty state */
-.ud-empty {
-    padding: 32px;
-    background: linear-gradient(135deg, #FFF9ED, #FDF3E3);
-    border: 1.5px dashed rgba(245, 158, 11, 0.3);
-    border-radius: 16px;
-    text-align: center;
-    color: #9ca3af;
-    font-size: 0.9rem;
-}
-
-@media (max-width: 640px) {
-    .ud-upcoming-card {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .ud-upcoming-right {
-        align-items: flex-start;
-    }
-}
-
-/* ── Pending Invites ─────────────── */
-.ud-invites-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 16px;
-}
-
-.ud-invite-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 3px 10px;
-    background: linear-gradient(135deg, rgba(232, 99, 26, 0.12) 0%, rgba(240, 152, 25, 0.1) 100%);
-    border: 1px solid rgba(232, 99, 26, 0.25);
     border-radius: 100px;
-    font-size: 0.68rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    align-self: flex-start;
+    transition: all 0.2s;
+    box-shadow: 0 4px 16px rgba(232, 99, 26, 0.4);
+}
+
+.ud-upcoming-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(232, 99, 26, 0.55);
+}
+
+/* ═══════════════════════════════════════
+   TAB BAR
+═══════════════════════════════════════ */
+.ud-tabs {
+    display: flex;
+    gap: 4px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    margin-bottom: 28px;
+}
+
+.ud-tab {
+    position: relative;
+    background: none;
+    border: none;
+    padding: 12px 22px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #9ca3af;
+    cursor: pointer;
+    transition: color 0.18s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ud-tab.active {
+    color: #1a1a1a;
+}
+
+.ud-tab-indicator {
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #F59E0B, #E8631A);
+    border-radius: 2px 2px 0 0;
+}
+
+.ud-tab-badge {
+    background: #E8631A;
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 100px;
+    line-height: 1.4;
+}
+
+.ud-tab-panel {
+    min-height: 240px;
+}
+
+/* ═══════════════════════════════════════
+   TRIP IMAGE CARDS GRID
+═══════════════════════════════════════ */
+.ud-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.ud-trip-card {
+    border-radius: 18px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+    cursor: pointer;
+    transition: box-shadow 0.25s;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.ud-trip-img-wrap {
+    position: relative;
+    height: 160px;
+    overflow: hidden;
+}
+
+.ud-trip-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.ud-trip-card:hover .ud-trip-img {
+    transform: scale(1.06);
+}
+
+.ud-trip-gradient {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.55) 0%, transparent 60%);
+}
+
+.ud-trip-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 100px;
+    backdrop-filter: blur(8px);
+}
+
+.ud-trip-badge.owner {
+    background: rgba(245, 158, 11, 0.22);
+    color: #fde68a;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.ud-trip-badge.collaborator {
+    background: rgba(99, 102, 241, 0.22);
+    color: #c7d2fe;
+    border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.ud-trip-body {
+    padding: 14px 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.ud-trip-location {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+.ud-trip-dates {
+    font-size: 0.76rem;
+    color: #9ca3af;
+    margin: 0;
+}
+
+.ud-trip-budget {
+    font-size: 0.78rem;
     font-weight: 700;
     color: #E8631A;
-    letter-spacing: 0.04em;
-    animation: ud-pulse 2s ease-in-out infinite;
+    margin: 0;
 }
 
-@keyframes ud-pulse {
-
-    0%,
-    100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0.7;
-    }
-}
-
+/* ═══════════════════════════════════════
+   INVITE CARDS
+═══════════════════════════════════════ */
 .ud-invites-list {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
 }
 
 .ud-invite-card {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: 16px;
-    padding: 18px 22px;
-    background: linear-gradient(135deg, #FFFBF5, #FFF7ED);
-    border: 1.5px solid rgba(245, 158, 11, 0.2);
+    background: white;
     border-radius: 16px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-    position: relative;
+    padding: 14px 16px;
+    box-shadow: 0 3px 14px rgba(0, 0, 0, 0.07);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.2s;
+}
+
+.ud-invite-card:hover {
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1);
+}
+
+.ud-invite-thumb {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
     overflow: hidden;
-    flex-wrap: wrap;
-    gap: 12px;
-}
-
-.ud-invite-card::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: linear-gradient(180deg, #F59E0B, #E8631A);
-    border-radius: 3px 0 0 3px;
-}
-
-.ud-invite-left {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    min-width: 0;
-}
-
-.ud-invite-icon {
-    font-size: 1.4rem;
     flex-shrink: 0;
-    width: 40px;
-    height: 40px;
-    background: rgba(245, 158, 11, 0.1);
-    border-radius: 10px;
+}
+
+.ud-invite-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ud-invite-info {
+    flex: 1;
+    min-width: 0;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
+    gap: 3px;
 }
 
 .ud-invite-dest {
-    font-size: 1rem;
+    font-size: 0.92rem;
     font-weight: 700;
     color: #1a1a1a;
-    margin: 0 0 3px;
-    font-family: var(--font-display, Georgia, serif);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .ud-invite-dates {
-    font-size: 0.8rem;
+    font-size: 0.76rem;
     color: #9ca3af;
     margin: 0;
 }
 
 .ud-invite-actions {
     display: flex;
-    align-items: center;
     gap: 8px;
     flex-shrink: 0;
 }
 
 .ud-invite-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 9px 20px;
+    padding: 9px 18px;
     border-radius: 100px;
     font-size: 0.82rem;
     font-weight: 700;
     cursor: pointer;
-    border: none;
+    border: 1.5px solid transparent;
     transition: all 0.18s;
-    min-width: 90px;
-    min-height: 38px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .ud-invite-btn.accept {
-    background: linear-gradient(135deg, #10b981, #059669);
+    background: linear-gradient(135deg, #F59E0B, #E8631A);
     color: white;
-    box-shadow: 0 3px 12px rgba(16, 185, 129, 0.35);
+    box-shadow: 0 3px 12px rgba(232, 99, 26, 0.35);
 }
 
-.ud-invite-btn.accept:hover:not(:disabled) {
-    box-shadow: 0 5px 18px rgba(16, 185, 129, 0.5);
+.ud-invite-btn.accept:hover {
+    box-shadow: 0 6px 20px rgba(232, 99, 26, 0.5);
     transform: translateY(-1px);
 }
 
 .ud-invite-btn.decline {
     background: transparent;
     color: #9ca3af;
-    border: 1.5px solid #e5e7eb;
+    border-color: rgba(0, 0, 0, 0.12);
 }
 
-.ud-invite-btn.decline:hover:not(:disabled) {
-    border-color: #d1d5db;
-    color: #6b7280;
-    background: #f9fafb;
+.ud-invite-btn.decline:hover {
+    border-color: #e11d48;
+    color: #e11d48;
 }
 
 .ud-invite-btn:disabled {
     opacity: 0.55;
     cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
 }
 
-.ud-invite-spinner {
+/* ═══════════════════════════════════════
+   EMPTY STATES + LOADING SKELETONS
+═══════════════════════════════════════ */
+.ud-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 64px 24px;
+    text-align: center;
+}
+
+.ud-empty-icon {
+    font-size: 2.5rem;
+    line-height: 1;
+}
+
+.ud-empty-state p {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #6b7280;
+    margin: 0;
+}
+
+.ud-empty-hint {
+    font-size: 0.85rem !important;
+    font-weight: 400 !important;
+    color: #c4b5aa !important;
+}
+
+.ud-empty-cta {
+    background: none;
+    border: none;
+    color: #E8631A;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding: 0;
+    margin-top: 4px;
+}
+
+.ud-empty-cta:hover {
+    text-decoration: underline;
+}
+
+.ud-loading-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.ud-skeleton {
+    height: 240px;
+    border-radius: 18px;
+    background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* ── Spinner ──────────────────────────── */
+.ud-spinner {
     display: inline-block;
     width: 14px;
     height: 14px;
     border: 2px solid rgba(255, 255, 255, 0.4);
-    border-top-color: currentColor;
+    border-top-color: white;
     border-radius: 50%;
-    animation: ud-spin 0.65s linear infinite;
+    animation: spin 0.65s linear infinite;
 }
 
-@keyframes ud-spin {
+@keyframes spin {
     to {
         transform: rotate(360deg);
+    }
+}
+
+/* ═══════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════ */
+@media (max-width: 900px) {
+    .ud-stats-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .ud-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 580px) {
+    .ud-hero-inner {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .ud-stats-row {
+        grid-template-columns: repeat(2, 1fr);
+        margin-top: -20px;
+    }
+
+    .ud-cards-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .ud-upcoming {
+        height: 280px;
+    }
+
+    .ud-invite-card {
+        flex-wrap: wrap;
     }
 }
