@@ -1,6 +1,5 @@
 import HeroSection from '../components/HeroSection'
 import SocialProofStrip from '../components/SocialProofStrip'
-import PitchSection from '../components/PitchSection'
 import HowItWorks from '../components/HowItWorks'
 import DestinationCards from '../components/DestinationCards'
 import CTASection from '../components/CTASection'
@@ -11,7 +10,6 @@ const LandingPage = () => {
     <main>
       <HeroSection />
       <SocialProofStrip />
-      <PitchSection />
       <HowItWorks />
       <DestinationCards />
       <CTASection />

@@ -75,43 +75,28 @@
   position: absolute;
   display: flex;
   align-items: center;
-  gap: 6px;
-  background: rgba(255, 255, 255, 0.14);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  gap: 7px;
+  background: rgba(20, 10, 0, 0.52);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(245, 158, 11, 0.28);
   border-radius: 100px;
-  padding: 6px 14px 6px 8px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: white;
-  letter-spacing: 0.02em;
+  padding: 8px 16px 8px 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.92);
+  letter-spacing: 0.03em;
   z-index: 8;
   cursor: default;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(245, 158, 11, 0.15) inset;
   white-space: nowrap;
+  transform: translateX(-50%);
 }
 
-.hero-pin-dot {
-  width: 8px;
-  height: 8px;
-  background: #F59E0B;
-  border-radius: 50%;
-  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.35);
-  animation: pin-pulse 2s ease-in-out infinite;
+.hero-pin-emoji {
+  font-size: 1rem;
+  line-height: 1;
   flex-shrink: 0;
-}
-
-@keyframes pin-pulse {
-
-  0%,
-  100% {
-    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.35);
-  }
-
-  50% {
-    box-shadow: 0 0 0 6px rgba(245, 158, 11, 0.15);
-  }
 }
 
 /* ── Hero content ─────────────────────── */
