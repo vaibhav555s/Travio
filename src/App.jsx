@@ -8,6 +8,8 @@ import Plans from './pages/Plans'
 import PlanDetail from './pages/PlanDetail'
 import Dashboard from './pages/Dashboard'
 import Navigation from './components/Navigation'
+import SignupPage from './pages/SignupPage'
+import LoginPage from './pages/LoginPage'
 
 function App() {
   return (
@@ -22,6 +24,8 @@ function App() {
           <Route path="/plans" element={<Plans />} />
           <Route path="/plans/:planId" element={<PlanDetail />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/login"  element={<LoginPage />} />
         </Routes>
       </AnimatePresence>
     </BrowserRouter>
