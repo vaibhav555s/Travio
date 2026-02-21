@@ -82,9 +82,10 @@
 
 /* Scrolled state overriding white text back to dark */
 .navbar.scrolled {
-  background-color: rgba(255, 255, 255, 0.95);
-  box-shadow: var(--shadow-sm);
-  border-bottom: 1px solid var(--color-border);
+  background-color: rgba(250, 248, 243, 0.96);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06), 0 4px 20px rgba(0, 0, 0, 0.06);
+  border-bottom: 1px solid rgba(245, 158, 11, 0.12);
+  backdrop-filter: blur(16px);
 }
 
 .navbar.scrolled .nav-logo {
@@ -149,7 +150,16 @@
 
 .nav-link:hover {
   color: var(--color-white);
-  /* Keeps text white on hover in top state */
+}
+
+/* Active page underline — add class 'active' in Navigation.jsx */
+.nav-link.active::after {
+  width: 100%;
+  background: linear-gradient(90deg, #F59E0B, #FDBA74);
+}
+
+.navbar.scrolled .nav-link.active::after {
+  background: linear-gradient(90deg, #F59E0B, #FDBA74);
 }
 
 .nav-link:hover::after {

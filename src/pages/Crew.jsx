@@ -3,17 +3,19 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
 import TravelerCard from '../components/TravelerCard'
 import { ArrowRightIcon } from '../components/SVGIcons'
+import { useAuth } from '../context/AuthContext'
 import './Crew.css'
 
-const DEFAULT_TRAVELER = (id, num) => ({
+const DEFAULT_TRAVELER = (id, name) => ({
   id,
-  name: `Traveler ${num}`,
+  name,
   age: '',
   interests: [],
 })
 
 const Crew = () => {
   const navigate = useNavigate()
+  const { user } = useAuth()
 
   // ── Consistency: restore full traveler list from sessionStorage ──
   const [travelers, setTravelers] = useState(() => {
@@ -26,10 +28,13 @@ const Crew = () => {
       } catch (_) { }
     }
 
-    // 2. Fall back to count from tripSetupData
+    // 2. Fall back to count from tripSetupData, seed traveler 1 with logged-in user name
     const savedTrip = sessionStorage.getItem('tripSetupData')
     const count = savedTrip ? (JSON.parse(savedTrip).travelers || 2) : 2
-    return Array.from({ length: count }, (_, i) => DEFAULT_TRAVELER(i + 1, i + 1))
+    const userName = user?.name || ''
+    return Array.from({ length: count }, (_, i) =>
+      DEFAULT_TRAVELER(i + 1, i === 0 && userName ? userName : `Traveler ${i + 1}`)
+    )
   })
 
   // ── Consistency: persist full crew to sessionStorage on every change ──
@@ -50,7 +55,7 @@ const Crew = () => {
   const handleAddTraveler = () => {
     if (travelers.length < 12) {
       const newId = Math.max(...travelers.map((t) => t.id), 0) + 1
-      setTravelers([...travelers, DEFAULT_TRAVELER(newId, travelers.length + 1)])
+      setTravelers([...travelers, DEFAULT_TRAVELER(newId, `Traveler ${travelers.length + 1}`)])
     }
   }
 
