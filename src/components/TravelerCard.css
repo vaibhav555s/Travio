@@ -1,0 +1,204 @@
+.traveler-card {
+  background: var(--color-white);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-base) var(--ease-out);
+}
+
+.traveler-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--color-accent);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: var(--text-body-sm);
+  flex-shrink: 0;
+}
+
+.name-field {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.name-display {
+  font-size: var(--text-body-sm);
+  color: var(--color-text-primary);
+  font-weight: 600;
+  cursor: pointer;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast) var(--ease-out);
+}
+
+.name-display:hover {
+  background: var(--color-surface);
+}
+
+.name-input {
+  font-size: var(--text-body-sm);
+  color: var(--color-text-primary);
+  font-weight: 600;
+  border: none;
+  border-bottom: 1.5px solid var(--color-accent);
+  background: transparent;
+  padding: var(--spacing-sm) var(--spacing-md);
+  width: 100%;
+  outline: none;
+  font-family: var(--font-body);
+}
+
+.remove-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-tertiary);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast) var(--ease-out);
+}
+
+.remove-btn:hover {
+  color: #ef4444;
+}
+
+.card-divider {
+  height: 1px;
+  background: var(--color-border);
+  margin: var(--spacing-lg) 0;
+}
+
+.section-label {
+  display: block;
+  font-size: var(--text-label);
+  color: var(--color-text-label);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--spacing-md);
+}
+
+.energy-section,
+.budget-section,
+.interests-section {
+  margin-bottom: var(--spacing-lg);
+}
+
+.energy-buttons {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.energy-btn {
+  width: 36px;
+  height: 36px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: white;
+  color: var(--color-text-primary);
+  font-size: var(--text-label);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast) var(--ease-out);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.energy-btn:hover {
+  border-color: var(--color-accent);
+}
+
+.energy-btn.active {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: white;
+}
+
+.budget-chips,
+.interests-chips {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.budget-chip,
+.interest-chip {
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: white;
+  color: var(--color-text-primary);
+  font-size: var(--text-label);
+  font-weight: 500;
+  padding: var(--spacing-sm) var(--spacing-md);
+  cursor: pointer;
+  transition: all var(--transition-fast) var(--ease-out);
+}
+
+.budget-chip:hover,
+.interest-chip:hover {
+  border-color: var(--color-accent);
+  background: var(--color-accent-pale);
+}
+
+.budget-chip.active,
+.interest-chip.active {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .traveler-card {
+    padding: var(--spacing-lg);
+  }
+
+  .card-header {
+    gap: var(--spacing-md);
+  }
+
+  .avatar {
+    width: 40px;
+    height: 40px;
+    font-size: var(--text-label);
+  }
+
+  .energy-buttons {
+    gap: var(--spacing-xs);
+  }
+
+  .energy-btn {
+    width: 32px;
+    height: 32px;
+    font-size: var(--text-caption);
+  }
+
+  .budget-chip,
+  .interest-chip {
+    font-size: var(--text-caption);
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+}

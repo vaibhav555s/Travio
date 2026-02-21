@@ -1,0 +1,81 @@
+.vibe-hint {
+  color: var(--color-text-secondary);
+  margin-top: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.vibe-chips-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+}
+
+.vibe-chip {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  background: var(--color-off-white);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast) var(--ease-out);
+  font-family: var(--font-body);
+  overflow: hidden;
+}
+
+.vibe-chip .chip-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--color-accent);
+  z-index: 0;
+}
+
+.vibe-chip:hover {
+  border-color: var(--color-accent);
+  background: var(--color-accent-pale);
+}
+
+.vibe-chip.selected {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: white;
+}
+
+.vibe-chip.selected svg {
+  color: white;
+}
+
+.vibe-chip svg {
+  position: relative;
+  z-index: 1;
+  transition: color var(--transition-fast) var(--ease-out);
+}
+
+.chip-label {
+  position: relative;
+  z-index: 1;
+  color: var(--color-text-primary);
+  font-weight: 500;
+  transition: color var(--transition-fast) var(--ease-out);
+}
+
+.vibe-chip.selected .chip-label {
+  color: white;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .vibe-chips-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .vibe-chip {
+    padding: var(--spacing-md);
+  }
+}

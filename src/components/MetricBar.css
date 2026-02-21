@@ -1,0 +1,53 @@
+.metric-bar-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.metric-label {
+  font-size: var(--text-label);
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.metric-content {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.metric-bar {
+  flex: 1;
+  height: 4px;
+  background: var(--color-surface);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.metric-fill {
+  height: 100%;
+  background-color: var(--color-accent);
+  border-radius: var(--radius-pill);
+}
+
+.metric-value {
+  font-size: var(--text-label);
+  font-weight: 600;
+  min-width: 36px;
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .metric-bar-container {
+    gap: var(--spacing-xs);
+  }
+
+  .metric-label {
+    font-size: var(--text-caption);
+  }
+
+  .metric-value {
+    font-size: var(--text-caption);
+    min-width: 32px;
+  }
+}

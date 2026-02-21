@@ -1,0 +1,65 @@
+.stepper-wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.stepper-btn {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-white);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  cursor: pointer;
+  transition: all var(--transition-fast) var(--ease-out);
+  flex-shrink: 0;
+}
+
+.stepper-btn:hover:not(:disabled) {
+  background: var(--color-accent-pale);
+  border-color: var(--color-accent);
+  transform: scale(1.05);
+}
+
+.stepper-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  color: var(--color-text-tertiary);
+}
+
+.stepper-display {
+  flex: 1;
+  text-align: center;
+  color: var(--color-accent);
+  font-weight: 600;
+  line-height: 1;
+}
+
+.stepper-hint {
+  color: var(--color-text-secondary);
+  text-align: center;
+  margin-top: var(--spacing-sm);
+}
+
+@media (max-width: 768px) {
+  .stepper-wrapper {
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+  }
+
+  .stepper-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 1.25rem;
+  }
+}

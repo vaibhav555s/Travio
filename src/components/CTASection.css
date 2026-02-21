@@ -1,0 +1,103 @@
+.cta-section {
+  position: relative;
+  padding: var(--spacing-5xl) 0;
+  overflow: hidden;
+}
+
+.cta-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, var(--color-deep) 0%, #2d3748 100%);
+  z-index: -1;
+}
+
+.cta-content {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-4xl);
+  align-items: center;
+  padding: 0 var(--section-pad);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.cta-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.cta-text .text-display {
+  color: white;
+}
+
+.cta-text .text-lead {
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 500px;
+  line-height: var(--line-height-relaxed);
+}
+
+.cta-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  width: fit-content;
+  background: var(--color-accent);
+  color: white;
+  padding: var(--spacing-md) var(--spacing-2xl);
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  font-size: var(--text-body-sm);
+  text-decoration: none;
+  transition: all var(--transition-fast) var(--ease-out);
+}
+
+.cta-button:hover {
+  background: var(--color-accent-light);
+  transform: translateY(-3px);
+  box-shadow: 0 20px 40px rgba(217, 119, 6, 0.3);
+}
+
+.cta-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-2xl);
+}
+
+.stat-box {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  backdrop-filter: blur(10px);
+  text-align: center;
+}
+
+.stat-box .text-lead {
+  color: var(--color-accent-light);
+  margin-bottom: var(--spacing-sm);
+  font-weight: 600;
+}
+
+.stat-box p {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+@media (max-width: 768px) {
+  .cta-content {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-3xl);
+  }
+
+  .cta-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .cta-text .text-display {
+    font-size: var(--text-title);
+  }
+}

@@ -1,0 +1,231 @@
+.navbar-new {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: rgba(249, 247, 244, 0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--color-border);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--section-pad);
+}
+
+.navbar-new-container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.navbar-logo-new {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-style: italic;
+  color: var(--color-text-primary);
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.navbar-right-new {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.crew-badge {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  padding: 6px 12px;
+  background: var(--color-surface);
+  border-radius: var(--radius-pill);
+}
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--nav-height);
+  background: transparent;
+  backdrop-filter: none;
+  z-index: 1000;
+  transition: all var(--transition-base) var(--ease-out);
+}
+
+.navbar.scrolled {
+  background: var(--color-glass);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-md);
+}
+
+.nav-container {
+  width: 100%;
+  max-width: 1400px;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 var(--section-pad);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-logo {
+  font-style: italic;
+  color: var(--color-accent);
+  white-space: nowrap;
+  letter-spacing: -0.02em;
+}
+
+.nav-menu {
+  display: flex;
+  gap: var(--spacing-4xl);
+  flex: 1;
+  justify-content: center;
+  margin: 0 var(--spacing-4xl);
+}
+
+.nav-link {
+  color: var(--color-text-primary);
+  position: relative;
+  transition: color var(--transition-fast) var(--ease-out);
+  font-weight: 500;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--color-accent);
+  transition: width var(--transition-fast) var(--ease-out);
+}
+
+.nav-link:hover {
+  color: var(--color-accent);
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+}
+
+.nav-sign-in {
+  color: var(--color-text-primary);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-pill);
+  transition: all var(--transition-fast) var(--ease-out);
+  font-weight: 500;
+}
+
+.nav-sign-in:hover {
+  background: var(--color-surface);
+  color: var(--color-accent);
+}
+
+.nav-btn-primary {
+  background: var(--color-accent);
+  color: white;
+  padding: var(--spacing-md) var(--spacing-xl);
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  transition: all var(--transition-fast) var(--ease-out);
+  display: inline-block;
+}
+
+.nav-btn-primary:hover {
+  background: var(--color-accent-light);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.nav-mobile-toggle {
+  display: none;
+  color: var(--color-text-primary);
+}
+
+.nav-mobile-menu {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .nav-container {
+    padding: 0 var(--section-pad-mobile);
+  }
+
+  .nav-menu {
+    display: none;
+  }
+
+  .nav-actions {
+    display: none;
+  }
+
+  .nav-mobile-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nav-mobile-menu {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg);
+    background: var(--color-white);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .mobile-link,
+  .mobile-sign-in,
+  .mobile-btn-primary {
+    width: 100%;
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    text-align: center;
+    font-weight: 500;
+  }
+
+  .mobile-link {
+    color: var(--color-text-primary);
+    background: var(--color-surface);
+    transition: all var(--transition-fast) var(--ease-out);
+  }
+
+  .mobile-link:hover {
+    background: var(--color-border);
+  }
+
+  .mobile-sign-in {
+    background: var(--color-surface);
+    color: var(--color-text-primary);
+    transition: all var(--transition-fast) var(--ease-out);
+  }
+
+  .mobile-sign-in:hover {
+    background: var(--color-border);
+  }
+
+  .mobile-btn-primary {
+    background: var(--color-accent);
+    color: white;
+  }
+
+  .mobile-btn-primary:hover {
+    background: var(--color-accent-light);
+  }
+}

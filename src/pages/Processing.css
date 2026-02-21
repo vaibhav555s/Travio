@@ -1,0 +1,131 @@
+.processing-page {
+  position: fixed;
+  inset: 0;
+  margin-top: var(--nav-height);
+  background: var(--color-deep);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  z-index: 50;
+}
+
+.processing-background {
+  position: absolute;
+  inset: 0;
+  background-image: url('https://images.unsplash.com/photo-1527958471914-4e046de08f45?auto=format&fit=crop&w=2000&q=70');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.2;
+}
+
+.processing-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(217, 119, 6, 0.08) 0%, transparent 70%);
+  filter: blur(80px);
+  pointer-events: none;
+}
+
+.processing-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-3xl);
+  max-width: 480px;
+}
+
+.progress-ring-container {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-svg {
+  transform: rotate(-90deg);
+}
+
+.ring-center {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  background: rgba(217, 119, 6, 0.1);
+  border-radius: 50%;
+  backdrop-filter: blur(10px);
+}
+
+.ring-center svg {
+  width: 24px;
+  height: 24px;
+}
+
+.processing-message {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1.5rem, 4vw, 1.75rem);
+  color: white;
+  text-align: center;
+  line-height: 1.3;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.processing-details {
+  font-size: var(--text-body-sm);
+  color: rgba(255, 255, 255, 0.4);
+  text-align: center;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--color-accent);
+  border-radius: var(--radius-pill);
+}
+
+@media (max-width: 768px) {
+  .processing-content {
+    gap: var(--spacing-2xl);
+    padding: var(--spacing-2xl);
+  }
+
+  .progress-ring-container {
+    width: 120px;
+    height: 120px;
+  }
+
+  .progress-svg {
+    width: 120px;
+    height: 120px;
+  }
+
+  .ring-center {
+    width: 60px;
+    height: 60px;
+  }
+
+  .processing-message {
+    font-size: clamp(1.25rem, 3vw, 1.5rem);
+  }
+}
