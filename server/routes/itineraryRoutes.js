@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import { generateOptionsHandler, generateItineraryHandler, refineItineraryHandler } from '../controllers/itineraryController.js'
 import { generateOptionsHandler, generateItineraryHandler } from '../controllers/itineraryController.js'
 import { protect } from '../middleware/auth.js'
 
@@ -13,6 +14,10 @@ const optionalAuth = (req, res, next) => {
   next()  // continues without req.user
 }
 
+// POST /api/generate-itinerary
+router.post('/generate-itinerary', generateItineraryHandler)
+// POST /api/itinerary/refine
+router.post('/itinerary/refine', refineItineraryHandler)
 router.post('/generate-options',   optionalAuth, generateOptionsHandler)
 router.post('/generate-itinerary', optionalAuth, generateItineraryHandler)
 

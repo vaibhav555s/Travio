@@ -1,0 +1,37 @@
+{
+  "tagline": "Discover the vibrant culture and history of Rajasthan.",
+  "totalCost": "Rs.20,000",
+  "aiNote": "I replaced some activities with more budget-friendly options and removed the visit to City Palace to make the itinerary more affordable.",
+  "days": [
+    {
+      "day": 1,
+      "title": "Mumbai to Jaipur",
+      "activities": [
+        {
+          "time": "09:00",
+          "activity": "Explore Albert Hall Museum",
+          "location": "Ram Niwas Garden",
+          "costEstimate": "Rs.200"
+        },
+        {
+          "time": "12:00",
+          "activity": "Lunch at a local eatery",
+          "location": "Bapu Bazar",
+          "costEstimate": "Rs.150"
+        },
+        {
+          "time": "14:30",
+          "activity": "Discover Jantar Mantar",
+          "location": "Tripolia Bazar",
+          "costEstimate": "Rs.200"
+        },
+        {
+          "time": "17:00",
+          "activity": "Sunset at Nahargarh Fort",
+          "location": "Brahampuri",
+          "costEstimate": "Rs.200"
+        }
+      ]
+    }
+  ]
+}
