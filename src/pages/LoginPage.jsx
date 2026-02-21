@@ -3,14 +3,16 @@ import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import AuthPage from './AuthPage'
 import { ArrowRightIcon } from '../components/SVGIcons'
+import { useAuth } from '../context/AuthContext'
 import axios from 'axios'
 import './AuthPage.css'
 
 const LoginPage = () => {
   const navigate = useNavigate()
+  const { setUser } = useAuth()
   const [formData, setFormData] = useState({ email: '', password: '' })
-  const [error, setError]       = useState('')
-  const [loading, setLoading]   = useState(false)
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -26,7 +28,13 @@ const LoginPage = () => {
         { withCredentials: true }
       )
       localStorage.setItem('accessToken', data.accessToken)
-      navigate('/setup')
+      // JWT only contains user._id, so read name+email from the response body
+      if (data.user) {
+        localStorage.setItem('userName', data.user.name || '')
+        localStorage.setItem('userEmail', data.user.email || '')
+        setUser({ name: data.user.name || 'Traveler', email: data.user.email || '', id: data.user.id || '' })
+      }
+      navigate('/home')
     } catch (err) {
       setError(err.response?.data?.message || 'Invalid email or password')
     } finally {

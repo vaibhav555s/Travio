@@ -1,9 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { mockPlans } from '../data/mockPlans'
 import ActivityCard from '../components/ActivityCard'
-import MetricBar from '../components/MetricBar'
 import WhatIfDrawer from '../components/WhatIfDrawer'
 import './PlanDetail.css'
 
@@ -20,6 +18,9 @@ export default function PlanDetail() {
   const navigate = useNavigate()
   const originalPlan = mockPlans.find(p => p.id === planId) || mockPlans[0]
 
+  const [itinerary, setItinerary] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [selectedDay, setSelectedDay] = useState(1)
   const [showWhatIf, setShowWhatIf] = useState(false)
 
@@ -337,19 +338,22 @@ export default function PlanDetail() {
                   )}
                 </motion.button>
 
-                {refinedPlan && (
-                  <motion.button
-                    className="refine-reset-btn"
-                    onClick={handleReset}
-                    initial={{ opacity: 0, x: 10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    whileHover={{ scale: 1.02 }}
-                  >
-                    ↺ Reset to original
-                  </motion.button>
-                )}
+            {/* Travel Tips */}
+            {itinerary.travelTips && itinerary.travelTips.length > 0 && (
+              <div style={{ marginBottom: '1rem' }}>
+                <h4 style={{ fontSize: '0.75rem', letterSpacing: '0.1em', color: 'var(--color-text-secondary)', marginBottom: '0.75rem', textTransform: 'uppercase' }}>
+                  Travel Tips
+                </h4>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  {itinerary.travelTips.map((tip, idx) => (
+                    <li key={idx} style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start', fontSize: '0.875rem', color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
+                      <span style={{ color: accent, fontWeight: 'bold', flexShrink: 0 }}>✓</span>
+                      {tip}
+                    </li>
+                  ))}
+                </ul>
               </div>
-            </div>
+            )}
 
             <AnimatePresence>
               {refineError && (

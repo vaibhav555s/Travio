@@ -3,6 +3,8 @@ import { Link, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { MenuIcon, CloseIcon } from './SVGIcons'
 import StepIndicator from './StepIndicator'
+import ProfileDropdown from './ProfileDropdown'
+import { useAuth } from '../context/AuthContext'
 import './Navigation.css'
 
 const Navigation = () => {
@@ -10,18 +12,16 @@ const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [travelerCount, setTravelerCount] = useState(1)
   const location = useLocation()
+  const { isLoggedIn } = useAuth()
 
-  // Function to refresh traveler count from session storage
   const refreshTravelerCount = () => {
     const saved = sessionStorage.getItem('tripSetupData')
     if (saved) {
       try {
         const parsed = JSON.parse(saved)
-        if (parsed.travelers) {
-          setTravelerCount(parsed.travelers)
-        }
+        if (parsed.travelers) setTravelerCount(parsed.travelers)
       } catch (e) {
-        console.error("Failed to parse trip setup data", e)
+        console.error('Failed to parse trip setup data', e)
       }
     }
   }
@@ -38,20 +38,10 @@ const Navigation = () => {
   const showNewNav = currentStep >= 0
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 100)
-    }
+    const handleScroll = () => setIsScrolled(window.scrollY > 100)
     window.addEventListener('scroll', handleScroll)
     window.addEventListener('tripDataUpdated', refreshTravelerCount)
-
-    // Initial load
     refreshTravelerCount()
-
-    // We can't strictly listen to sessionStorage changes from the same tab via 'storage' event,
-    // so we re-check it every time the location changes (which happens when moving between setup/crew/plans)
-    // AND through our custom event.
-    refreshTravelerCount()
-
     return () => {
       window.removeEventListener('scroll', handleScroll)
       window.removeEventListener('tripDataUpdated', refreshTravelerCount)
@@ -80,24 +70,21 @@ const Navigation = () => {
         </Link>
 
         <div className="nav-menu">
-          <Link to="/" className="nav-link text-body-sm">
-            Explore
-          </Link>
-          <Link to="/" className="nav-link text-body-sm">
-            How It Works
-          </Link>
-          <Link to="/" className="nav-link text-body-sm">
-            About
-          </Link>
+          <Link to="/" className="nav-link text-body-sm">Explore</Link>
+          <Link to="/" className="nav-link text-body-sm">How It Works</Link>
+          <Link to="/" className="nav-link text-body-sm">About</Link>
         </div>
 
         <div className="nav-actions">
-          <button className="nav-sign-in text-body-sm">
+          {/* Sign In always visible */}
+          <Link to="/login" className="nav-sign-in text-body-sm" style={{ textDecoration: 'none' }}>
             Sign In
-          </button>
+          </Link>
           <Link to="/setup" className="nav-btn-primary text-body-sm">
             Plan Your Trip
           </Link>
+          {/* Avatar — only when logged in */}
+          {isLoggedIn && <ProfileDropdown />}
         </div>
 
         <button
@@ -116,21 +103,20 @@ const Navigation = () => {
           exit={{ opacity: 0, height: 0 }}
           transition={{ duration: 0.3 }}
         >
-          <Link to="/" className="mobile-link text-body-sm">
-            Explore
-          </Link>
-          <Link to="/" className="mobile-link text-body-sm">
-            How It Works
-          </Link>
-          <Link to="/" className="mobile-link text-body-sm">
-            About
-          </Link>
-          <button className="mobile-sign-in text-body-sm">
+          <Link to="/" className="mobile-link text-body-sm">Explore</Link>
+          <Link to="/" className="mobile-link text-body-sm">How It Works</Link>
+          <Link to="/" className="mobile-link text-body-sm">About</Link>
+          <Link to="/login" className="mobile-sign-in text-body-sm" style={{ textDecoration: 'none' }}>
             Sign In
-          </button>
+          </Link>
           <Link to="/setup" className="mobile-btn-primary text-body-sm">
             Plan Your Trip
           </Link>
+          {isLoggedIn && (
+            <Link to="/home" className="mobile-link text-body-sm" onClick={() => setIsMobileMenuOpen(false)}>
+              My Dashboard
+            </Link>
+          )}
         </motion.div>
       )}
     </nav>
