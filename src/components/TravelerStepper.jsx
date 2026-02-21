@@ -15,6 +15,7 @@ const TravelerStepper = ({ value, onChange, min = 1, max = 12 }) => {
       <label className="text-label form-label">Number of Travelers</label>
       <div className="stepper-wrapper">
         <button
+          type="button"
           onClick={decrement}
           disabled={value <= min}
           className="stepper-btn stepper-minus"
@@ -34,6 +35,7 @@ const TravelerStepper = ({ value, onChange, min = 1, max = 12 }) => {
         </motion.div>
 
         <button
+          type="button"
           onClick={increment}
           disabled={value >= max}
           className="stepper-btn stepper-plus"
@@ -44,7 +46,7 @@ const TravelerStepper = ({ value, onChange, min = 1, max = 12 }) => {
       </div>
 
       <p className="text-caption stepper-hint">
-        {value === 1 ? 'Solo adventure' : `${value} people`}
+        {value === 1 ? 'Solo adventure' : value <= 4 ? 'Friends trip' : 'Group getaway'}
       </p>
     </div>
   )

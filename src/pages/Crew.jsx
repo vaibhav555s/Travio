@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
 import TravelerCard from '../components/TravelerCard'
@@ -7,13 +7,41 @@ import './Crew.css'
 
 const Crew = () => {
   const navigate = useNavigate()
-  const [travelers, setTravelers] = useState([
-    { id: 1, name: 'Traveler 1', energyLevel: 3, budgetType: 'Moderate', interests: [] },
-    { id: 2, name: 'Traveler 2', energyLevel: 3, budgetType: 'Moderate', interests: [] },
-  ])
+
+  const getInitialCount = () => {
+    const saved = sessionStorage.getItem('tripSetupData')
+    if (saved) {
+      const parsed = JSON.parse(saved)
+      return parsed.travelers || 2
+    }
+    return 2
+  }
+
+  const initialCount = getInitialCount()
+
+  const [travelers, setTravelers] = useState(
+    Array.from({ length: initialCount }, (_, i) => ({
+      id: i + 1,
+      name: `Traveler ${i + 1}`,
+      energyLevel: 3,
+      budgetType: 'Moderate',
+      interests: [],
+    }))
+  )
+
+  useEffect(() => {
+    const saved = sessionStorage.getItem('tripSetupData')
+    if (saved) {
+      const parsed = JSON.parse(saved)
+      if (parsed.travelers !== travelers.length) {
+        sessionStorage.setItem('tripSetupData', JSON.stringify({ ...parsed, travelers: travelers.length }))
+        window.dispatchEvent(new Event('tripDataUpdated'))
+      }
+    }
+  }, [travelers.length])
 
   const handleAddTraveler = () => {
-    if (travelers.length < 6) {
+    if (travelers.length < 12) {
       const newId = Math.max(...travelers.map((t) => t.id), 0) + 1
       setTravelers([
         ...travelers,
@@ -85,7 +113,7 @@ const Crew = () => {
             transition={{ duration: 0.6 }}
           >
             <h2 className="text-display form-title">Build your crew</h2>
-            <p className="text-body-sm form-subtitle">Add up to 6 travelers</p>
+            <p className="text-body-sm form-subtitle">Add up to 12 travelers</p>
           </motion.div>
 
           <motion.div
@@ -106,7 +134,7 @@ const Crew = () => {
               ))}
             </AnimatePresence>
 
-            {travelers.length < 6 && (
+            {travelers.length < 12 && (
               <motion.button
                 type="button"
                 className="add-traveler-btn"
@@ -146,7 +174,10 @@ const Crew = () => {
             </button>
             <p className="form-caption">Takes 4–8 seconds</p>
 
-            <Link to="/setup" className="back-link text-body-sm">
+            <Link
+              to="/setup"
+              className="back-link text-body-sm"
+            >
               ← Back to trip details
             </Link>
           </motion.div>

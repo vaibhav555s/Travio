@@ -27,13 +27,7 @@
 }
 
 .vibe-chip .chip-bg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: var(--color-accent);
-  z-index: 0;
+  display: none;
 }
 
 .vibe-chip:hover {
@@ -43,12 +37,12 @@
 
 .vibe-chip.selected {
   border-color: var(--color-accent);
-  background: var(--color-accent);
-  color: white;
+  background: var(--color-accent-pale);
+  color: var(--color-accent);
 }
 
 .vibe-chip.selected svg {
-  color: white;
+  color: var(--color-accent);
 }
 
 .vibe-chip svg {
@@ -66,7 +60,7 @@
 }
 
 .vibe-chip.selected .chip-label {
-  color: white;
+  color: var(--color-accent);
   font-weight: 600;
 }
 
