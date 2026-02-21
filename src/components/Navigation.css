@@ -86,10 +86,12 @@
 
 .nav-menu {
   display: flex;
-  gap: var(--spacing-4xl);
+  gap: var(--spacing-2xl);
+  /* Reduced from 4xl */
   flex: 1;
   justify-content: center;
-  margin: 0 var(--spacing-4xl);
+  margin: 0 var(--spacing-xl);
+  /* Reduced from 4xl */
 }
 
 .nav-link {

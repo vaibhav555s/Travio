@@ -1,11 +1,37 @@
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import PlanCard from '../components/PlanCard'
-import { mockPlans, mockCrewData } from '../data/mockPlans'
+import { mockPlans } from '../data/mockPlans'
 import './Plans.css'
 
 const Plans = () => {
   const avatarColors = ['#E8631A', '#4A9EDB', '#E8A21A', '#6B9E4A']
+  const [tripInfo, setTripInfo] = useState({ travelers: 1, destination: 'Goa', days: 5, mockTravelersList: [{ name: 'T1' }] })
+
+  useEffect(() => {
+    const saved = sessionStorage.getItem('tripSetupData')
+    if (saved) {
+      const data = JSON.parse(saved)
+      let calculatedDays = 1
+      if (data.departureDate && data.returnDate) {
+        const start = new Date(data.departureDate)
+        const end = new Date(data.returnDate)
+        const diffTime = Math.abs(end - start)
+        calculatedDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1
+      }
+
+      const count = data.travelers || 1;
+      const mockList = Array.from({ length: count }, (_, i) => ({ name: `T${i + 1}` }));
+
+      setTripInfo({
+        travelers: count,
+        destination: data.destination || 'your destination',
+        days: calculatedDays,
+        mockTravelersList: mockList
+      })
+    }
+  }, [])
 
   return (
     <main className="plans-page">
@@ -29,7 +55,7 @@ const Plans = () => {
         >
           <div className="crew-summary">
             <div className="avatars">
-              {mockCrewData.travelers.map((traveler, idx) => (
+              {tripInfo.mockTravelersList.slice(0, 4).map((traveler, idx) => (
                 <div
                   key={idx}
                   className="summary-avatar"
@@ -38,9 +64,14 @@ const Plans = () => {
                   {traveler.name.charAt(0)}
                 </div>
               ))}
+              {tripInfo.travelers > 4 && (
+                <div className="summary-avatar" style={{ backgroundColor: '#666' }}>
+                  +{tripInfo.travelers - 4}
+                </div>
+              )}
             </div>
             <div className="summary-text">
-              <p className="text-body-sm">{mockCrewData.travelers.length} travelers · {mockCrewData.destination} · {mockCrewData.duration} days</p>
+              <p className="text-body-sm">{tripInfo.travelers} traveler{tripInfo.travelers > 1 ? 's' : ''} · {tripInfo.destination} · {tripInfo.days} day{tripInfo.days > 1 ? 's' : ''}</p>
             </div>
           </div>
         </motion.div>

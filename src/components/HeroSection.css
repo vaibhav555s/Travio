@@ -30,33 +30,43 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.2) 0%,
-    rgba(0, 0, 0, 0.4) 50%,
-    rgba(0, 0, 0, 0.6) 100%
-  );
+  background: linear-gradient(to bottom,
+      rgba(0, 0, 0, 0.2) 0%,
+      rgba(0, 0, 0, 0.4) 50%,
+      rgba(0, 0, 0, 0.6) 100%);
 }
 
 .hero-content {
   position: relative;
   z-index: 10;
   width: 100%;
-  padding-bottom: 120px;
-  padding-top: var(--spacing-4xl);
-  text-align: center;
+  padding-bottom: 80px;
+  padding-top: calc(var(--spacing-5xl) + var(--nav-height));
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: var(--spacing-3xl);
+  justify-content: center;
+  /* Horizontally center */
 }
 
 .hero-text {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xl);
-  max-width: 900px;
+  align-items: center;
+  /* Center content horizontally */
+  gap: var(--spacing-lg);
+  max-width: 750px;
   color: white;
+  text-align: center;
+  /* Center the text itself */
+
+  /* Premium Glassmorphism Card */
+  background: rgba(20, 20, 20, 0.45);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: var(--spacing-4xl);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
 .hero .text-label {
@@ -76,13 +86,15 @@
   font-weight: 400;
   line-height: 1.6;
   max-width: 600px;
-  margin: 0 auto;
+  margin: 0;
+  /* Changed from margin: 0 auto to align left */
 }
 
 .hero-buttons {
   display: flex;
   gap: var(--spacing-lg);
-  justify-content: center;
+  justify-content: flex-start;
+  /* Changed from center */
   margin-top: var(--spacing-lg);
   flex-wrap: wrap;
 }
@@ -103,14 +115,15 @@
 }
 
 .btn-primary {
-  background: var(--color-accent);
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-light) 100%);
   color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 15px rgba(217, 119, 6, 0.4);
 }
 
 .btn-primary:hover {
-  background: var(--color-accent-light);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+  transform: translateY(-4px);
+  box-shadow: 0 15px 35px rgba(217, 119, 6, 0.6), 0 0 20px rgba(217, 119, 6, 0.4);
 }
 
 .btn-secondary {
@@ -135,7 +148,8 @@
   flex-direction: column;
   align-items: center;
   gap: var(--spacing-sm);
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.8);
+  z-index: 20;
 }
 
 .scroll-indicator span {

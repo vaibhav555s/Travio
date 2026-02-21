@@ -8,7 +8,23 @@ import './Navigation.css'
 const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [travelerCount, setTravelerCount] = useState(1)
   const location = useLocation()
+
+  // Function to refresh traveler count from session storage
+  const refreshTravelerCount = () => {
+    const saved = sessionStorage.getItem('tripSetupData')
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved)
+        if (parsed.travelers) {
+          setTravelerCount(parsed.travelers)
+        }
+      } catch (e) {
+        console.error("Failed to parse trip setup data", e)
+      }
+    }
+  }
 
   const getStepIndex = () => {
     if (location.pathname.includes('setup')) return 0
@@ -26,8 +42,21 @@ const Navigation = () => {
       setIsScrolled(window.scrollY > 100)
     }
     window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+    window.addEventListener('tripDataUpdated', refreshTravelerCount)
+
+    // Initial load
+    refreshTravelerCount()
+
+    // We can't strictly listen to sessionStorage changes from the same tab via 'storage' event,
+    // so we re-check it every time the location changes (which happens when moving between setup/crew/plans)
+    // AND through our custom event.
+    refreshTravelerCount()
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('tripDataUpdated', refreshTravelerCount)
+    }
+  }, [location.pathname])
 
   if (showNewNav) {
     return (
@@ -36,7 +65,7 @@ const Navigation = () => {
           <Link to="/" className="navbar-logo-new">Radiator Routes</Link>
           <StepIndicator currentStep={currentStep} />
           <div className="navbar-right-new">
-            <div className="crew-badge">4 travelers</div>
+            <div className="crew-badge">{travelerCount} traveler{travelerCount > 1 ? 's' : ''}</div>
           </div>
         </div>
       </nav>

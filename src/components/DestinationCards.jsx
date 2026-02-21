@@ -76,6 +76,7 @@ const DestinationCards = () => {
                 initial={{ opacity: 0, x: 30 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, margin: '-100px' }}
+                whileHover={{ scale: 1.02, y: -8 }}
                 transition={{ duration: 0.6, delay: idx * 0.1 }}
                 onHoverStart={() => setHoveredIdx(idx)}
                 onHoverEnd={() => setHoveredIdx(null)}

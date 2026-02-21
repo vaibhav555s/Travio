@@ -2,16 +2,12 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import './BudgetSlider.css'
 
-const BudgetSlider = ({ value, onChange, min = 500, max = 10000, step = 100 }) => {
+const BudgetSlider = ({ value, onChange, min = 5000, max = 200000, step = 1000 }) => {
   const [isDragging, setIsDragging] = useState(false)
   const percentage = ((value - min) / (max - min)) * 100
 
   const formatCurrency = (val) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-    }).format(val)
+    return `₹${val.toLocaleString('en-IN')}`
   }
 
   return (
@@ -32,10 +28,6 @@ const BudgetSlider = ({ value, onChange, min = 500, max = 10000, step = 100 }) =
         </div>
 
         <div className="slider-track">
-          <div
-            className="slider-fill"
-            style={{ width: `${percentage}%` }}
-          />
           <input
             type="range"
             min={min}
@@ -43,18 +35,11 @@ const BudgetSlider = ({ value, onChange, min = 500, max = 10000, step = 100 }) =
             step={step}
             value={value}
             onChange={(e) => onChange(Number(e.target.value))}
-            onMouseDown={() => setIsDragging(true)}
-            onMouseUp={() => setIsDragging(false)}
-            onTouchStart={() => setIsDragging(true)}
-            onTouchEnd={() => setIsDragging(false)}
-            className="slider-input"
+            className="budget-range-input"
+            style={{
+              background: `linear-gradient(to right, var(--color-accent) ${percentage}%, var(--color-border) ${percentage}%)`
+            }}
           />
-          <div
-            className={`slider-thumb ${isDragging ? 'dragging' : ''}`}
-            style={{ left: `${percentage}%` }}
-          >
-            <div className="thumb-inner" />
-          </div>
         </div>
 
         <div className="budget-range">

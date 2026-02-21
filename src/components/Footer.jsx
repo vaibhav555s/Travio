@@ -128,11 +128,6 @@ const Footer = () => {
           <p className="text-caption">
             © {currentYear} Radiator Routes. All rights reserved.
           </p>
-          <div className="footer-badges">
-            <span className="badge text-caption">Privacy First</span>
-            <span className="badge text-caption">100% Secure</span>
-            <span className="badge text-caption">24/7 Support</span>
-          </div>
         </div>
       </div>
     </footer>

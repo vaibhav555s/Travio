@@ -25,64 +25,63 @@
 
 .slider-track {
   position: relative;
-  height: 6px;
-  background: var(--color-border);
-  border-radius: var(--radius-pill);
-  cursor: pointer;
+  height: 24px;
+  display: flex;
+  align-items: center;
 }
 
-.slider-fill {
-  position: absolute;
-  height: 100%;
-  background: var(--color-accent);
-  border-radius: var(--radius-pill);
-  transition: width 100ms ease-out;
-}
-
-.slider-input {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  cursor: pointer;
-  opacity: 0;
+.budget-range-input {
   -webkit-appearance: none;
   appearance: none;
-  background: transparent;
-  transform: translateY(-50%);
-  z-index: 5;
+  width: 100%;
+  height: 6px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-pill);
+  outline: none;
+  cursor: pointer;
+  background: var(--color-border);
 }
 
-.slider-thumb {
-  position: absolute;
-  top: 50%;
-  width: 24px;
-  height: 24px;
+.budget-range-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
   background: var(--color-accent);
-  border-radius: var(--radius-pill);
-  transform: translate(-50%, -50%);
-  box-shadow: var(--shadow-md);
-  transition: all 150ms ease-out;
-  z-index: 10;
+  cursor: pointer;
+  transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
-.slider-thumb.dragging {
-  box-shadow: 0 0 0 8px rgba(217, 119, 6, 0.1);
-  transform: translate(-50%, -50%) scale(1.2);
+.budget-range-input::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 0 6px rgba(217, 119, 6, 0.1);
 }
 
-.thumb-inner {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 8px;
-  height: 8px;
-  background: white;
-  border-radius: var(--radius-pill);
-  transform: translate(-50%, -50%);
+.budget-range-input::-webkit-slider-thumb:active {
+  transform: scale(1.2);
+  box-shadow: 0 0 0 8px rgba(217, 119, 6, 0.2);
+}
+
+.budget-range-input::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  cursor: pointer;
+  border: none;
+  transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.budget-range-input::-moz-range-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 0 6px rgba(217, 119, 6, 0.1);
+}
+
+.budget-range-input::-moz-range-thumb:active {
+  transform: scale(1.2);
+  box-shadow: 0 0 0 8px rgba(217, 119, 6, 0.2);
 }
 
 .budget-range {
