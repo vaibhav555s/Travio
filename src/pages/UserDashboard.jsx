@@ -1,16 +1,11 @@
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import TripCard from '../components/TripCard'
 import TeamCard from '../components/TeamCard'
-import { useState, useEffect } from "react"
+import { useState, useEffect } from 'react'
 import './UserDashboard.css'
 
-const mockRecentTrips = [
-  { id: '1', destination: 'Goa', dates: 'Mar 1 – Mar 6', budget: '32,000', badge: 'owner' },
-  { id: '2', destination: 'Manali', dates: 'Apr 12 – Apr 18', budget: '28,000', badge: 'team', teamName: 'Weekend Warriors' },
-  { id: '3', destination: 'Rishikesh', dates: 'May 3 – May 7', budget: '18,000', badge: 'owner' },
-]
 const mockTeams = [
   { id: '1', name: 'Weekend Warriors', memberCount: 4, tripCount: 2 },
   { id: '2', name: 'Road Runners', memberCount: 2, tripCount: 1 },
@@ -25,38 +20,89 @@ const fadeUp = {
   show: { opacity: 1, y: 0, transition: { duration: 0.38, ease: [0.25, 0.1, 0.25, 1] } },
 }
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5500'
+
 export default function UserDashboard() {
   const { user } = useAuth()
   const navigate = useNavigate()
+
   const [recentTrips, setRecentTrips] = useState([])
   const [sharedTrips, setSharedTrips] = useState([])
+  const [pendingInvites, setPendingInvites] = useState([])
   const [tripsLoading, setTripsLoading] = useState(true)
+  const [accepting, setAccepting] = useState(null)
+  const [declining, setDeclining] = useState(null)
 
+  const token = localStorage.getItem('accessToken')
+  const authHeader = { Authorization: `Bearer ${token}` }
+
+  // ── Fetch all data on mount ──────────────────────────
   useEffect(() => {
-    const fetchTrips = async () => {
+    const fetchAll = async () => {
+      if (!token) { setTripsLoading(false); return }
       try {
-        const token = localStorage.getItem('accessToken')
-        if (!token) return
-
-        const [ownRes, sharedRes] = await Promise.all([
-          fetch(`${import.meta.env.VITE_API_URL}/api/trips`, { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`${import.meta.env.VITE_API_URL}/api/trips/shared`, { headers: { Authorization: `Bearer ${token}` } }),
+        const [ownRes, sharedRes, inviteRes] = await Promise.all([
+          fetch(`${API_URL}/api/trips`, { headers: authHeader }),
+          fetch(`${API_URL}/api/trips/shared`, { headers: authHeader }),
+          fetch(`${API_URL}/api/trips/invites`, { headers: authHeader }),
         ])
-
         if (ownRes.ok) setRecentTrips(await ownRes.json())
         if (sharedRes.ok) setSharedTrips(await sharedRes.json())
+        if (inviteRes.ok) setPendingInvites(await inviteRes.json())
       } catch (err) {
         console.error('Failed to fetch trips:', err)
       } finally {
         setTripsLoading(false)
       }
     }
-    fetchTrips()
+    fetchAll()
   }, [])
 
-  const tripSetup = (() => {
-    try { return JSON.parse(sessionStorage.getItem('tripSetupData') || '{}') } catch { return {} }
-  })()
+  // ── Accept invite ────────────────────────────────────
+  const handleAccept = async (tripId) => {
+    setAccepting(tripId)
+    try {
+      const res = await fetch(`${API_URL}/api/trips/${tripId}/accept`, {
+        method: 'POST', headers: authHeader,
+      })
+      if (res.ok) {
+        const accepted = pendingInvites.find(i => i.tripId === tripId)
+        setPendingInvites(prev => prev.filter(i => i.tripId !== tripId))
+        if (accepted) {
+          setSharedTrips(prev => [...prev, {
+            _id: accepted.tripId,
+            destination: accepted.destination,
+            departureDate: accepted.departureDate,
+            returnDate: accepted.returnDate,
+            budget: accepted.budget,
+          }])
+        }
+      }
+    } catch (err) {
+      console.error('Accept failed:', err)
+    } finally {
+      setAccepting(null)
+    }
+  }
+
+  // ── Decline invite ───────────────────────────────────
+  const handleDecline = async (tripId) => {
+    setDeclining(tripId)
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]))
+      const myId = payload.id || payload._id || payload.sub
+      const res = await fetch(`${API_URL}/api/trips/${tripId}/collaborators/${myId}`, {
+        method: 'DELETE', headers: authHeader,
+      })
+      if (res.ok) setPendingInvites(prev => prev.filter(i => i.tripId !== tripId))
+    } catch (err) {
+      console.error('Decline failed:', err)
+    } finally {
+      setDeclining(null)
+    }
+  }
+
+  const tripSetup = (() => { try { return JSON.parse(sessionStorage.getItem('tripSetupData') || '{}') } catch { return {} } })()
   const hasUpcoming = !!tripSetup.destination
   const firstName = user?.name?.split(' ')[0] || 'Traveler'
 
@@ -77,6 +123,67 @@ export default function UserDashboard() {
           <p className="ud-subtitle">Let's continue your adventure.</p>
           <div className="ud-header-divider" />
         </motion.div>
+
+        {/* ── Pending Invites — only shown when there are pending invites ── */}
+        <AnimatePresence>
+          {!tripsLoading && pendingInvites.length > 0 && (
+            <motion.div
+              variants={fadeUp} initial="hidden" animate="show"
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ delay: 0.05 }}
+            >
+              <div className="ud-invites-header">
+                <p className="ud-section-title" style={{ margin: 0 }}>Trip Invites</p>
+                <span className="ud-invite-badge">{pendingInvites.length} pending</span>
+              </div>
+
+              <div className="ud-invites-list">
+                <AnimatePresence>
+                  {pendingInvites.map(invite => (
+                    <motion.div
+                      key={invite.tripId}
+                      className="ud-invite-card"
+                      initial={{ opacity: 0, x: -16 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 16, transition: { duration: 0.22 } }}
+                    >
+                      <div className="ud-invite-left">
+                        <div className="ud-invite-icon">✈️</div>
+                        <div>
+                          <p className="ud-invite-dest">{invite.destination}</p>
+                          <p className="ud-invite-dates">
+                            {invite.departureDate?.slice(0, 10)} → {invite.returnDate?.slice(0, 10)}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="ud-invite-actions">
+                        <button
+                          className="ud-invite-btn accept"
+                          onClick={() => handleAccept(invite.tripId)}
+                          disabled={accepting === invite.tripId || declining === invite.tripId}
+                        >
+                          {accepting === invite.tripId
+                            ? <span className="ud-invite-spinner" />
+                            : '✓ Accept'}
+                        </button>
+                        <button
+                          className="ud-invite-btn decline"
+                          onClick={() => handleDecline(invite.tripId)}
+                          disabled={accepting === invite.tripId || declining === invite.tripId}
+                        >
+                          {declining === invite.tripId
+                            ? <span className="ud-invite-spinner" />
+                            : 'Decline'}
+                        </button>
+                      </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* ── Upcoming Trip ── */}
         <motion.div variants={fadeUp} initial="hidden" animate="show" transition={{ delay: 0.1 }}>
@@ -107,17 +214,14 @@ export default function UserDashboard() {
           ) : (
             <div className="ud-empty">
               No trip planned yet.{' '}
-              <button
-                style={{ background: 'none', border: 'none', color: '#E8631A', cursor: 'pointer', fontWeight: 700 }}
-                onClick={() => navigate('/setup')}
-              >
+              <button style={{ background: 'none', border: 'none', color: '#E8631A', cursor: 'pointer', fontWeight: 700 }} onClick={() => navigate('/setup')}>
                 Plan one now →
               </button>
             </div>
           )}
         </motion.div>
 
-        {/* ── Recent Trips (staggered) ── */}
+        {/* ── Recent Trips ── */}
         <motion.div variants={fadeUp} initial="hidden" animate="show" transition={{ delay: 0.18 }}>
           <p className="ud-section-title">Recent Trips</p>
           {tripsLoading ? (
@@ -125,10 +229,7 @@ export default function UserDashboard() {
           ) : recentTrips.length === 0 ? (
             <div className="ud-empty">
               No trips yet.{' '}
-              <button
-                style={{ background: 'none', border: 'none', color: '#E8631A', cursor: 'pointer', fontWeight: 700 }}
-                onClick={() => navigate('/setup')}
-              >
+              <button style={{ background: 'none', border: 'none', color: '#E8631A', cursor: 'pointer', fontWeight: 700 }} onClick={() => navigate('/setup')}>
                 Plan your first trip →
               </button>
             </div>
@@ -156,7 +257,7 @@ export default function UserDashboard() {
             <p style={{ color: 'var(--color-text-secondary)' }}>Loading...</p>
           ) : sharedTrips.length === 0 ? (
             <div className="ud-empty">
-              No shared trips yet. Ask a trip owner to invite you.
+              No shared trips yet. Accept an invite above to see trips shared with you.
             </div>
           ) : (
             <motion.div className="ud-scroll-row" variants={stagger} initial="hidden" animate="show">
@@ -175,8 +276,8 @@ export default function UserDashboard() {
           )}
         </motion.div>
 
-        {/* ── Teams Snapshot (staggered) ── */}
-        <motion.div variants={fadeUp} initial="hidden" animate="show" transition={{ delay: 0.26 }}>
+        {/* ── Teams ── */}
+        <motion.div variants={fadeUp} initial="hidden" animate="show" transition={{ delay: 0.32 }}>
           <p className="ud-section-title">Your Teams</p>
           <motion.div className="ud-grid" variants={stagger} initial="hidden" animate="show">
             {mockTeams.map(team => (
