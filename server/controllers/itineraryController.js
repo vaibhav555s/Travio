@@ -1,4 +1,4 @@
-import { generateOptions, generateItinerary, refineItinerary } from '../services/geminiService.js'
+import { generateOptions, generateItinerary, refineItinerary, extractTripParams } from '../services/geminiService.js'
 import Trip from '../models/Trip.js'
 import Plan from '../models/Plan.js'
 import Itinerary from '../models/Itinerary.js'
@@ -173,5 +173,61 @@ export async function refineItineraryHandler(req, res) {
   } catch (err) {
     console.error('[refineItinerary] Error:', err.message)
     return res.status(500).json({ error: 'Failed to refine itinerary. Please try again.' })
+  }
+}
+
+/**
+ * POST /api/itinerary/voice-to-setup
+ * Body: { prompt }
+ * Extracts trip parameters from voice transcription for pre-filling the setup form.
+ */
+export async function voiceToSetupHandler(req, res) {
+  try {
+    const { prompt } = req.body
+    if (!prompt) {
+      return res.status(400).json({ error: 'Prompt is required' })
+    }
+
+    const data = await extractTripParams(prompt)
+
+    // Mandatory Rule: Destination is required for redirection
+    if (!data.destination) {
+      return res.json({
+        error: "DESTINATION_REQUIRED",
+        message: "Please specify a destination in your request."
+      })
+    }
+
+    // Smart Date Calculation
+    const today = new Date()
+    const formatDate = (date) => date.toISOString().split('T')[0]
+
+    const days = Number(data.days) || 3
+    const defaultDeparture = new Date(today)
+    defaultDeparture.setDate(today.getDate() + 7) // Default to 7 days from now
+
+    const defaultReturn = new Date(defaultDeparture)
+    defaultReturn.setDate(defaultDeparture.getDate() + days)
+
+    // Backend Safety Layer: Sanitize LLM output and apply robust defaults
+    const safeData = {
+      source: (data.source || "Mumbai").trim(),
+      destination: data.destination.trim(),
+      days: days,
+      travelers: Number(data.travelers) || 1,
+      departureDate: data.departureDate || formatDate(defaultDeparture),
+      returnDate: data.returnDate || formatDate(defaultReturn),
+      vibes: (Array.isArray(data.vibes) && data.vibes.length > 0) ? data.vibes : ["Sightseeing", "Adventure"],
+      crew: Array.isArray(data.crew) ? data.crew : [],
+      autoSubmit: true // Signal to frontend to move fast
+    }
+
+    // Dynamic budget calculation: days * 5000 (if no budget provided)
+    safeData.budget = Number(data.budget) || (safeData.days * 5000)
+
+    return res.status(200).json(safeData)
+  } catch (err) {
+    console.error('[voiceToSetupHandler] Error:', err)
+    return res.status(500).json({ error: 'Failed to extract trip parameters' })
   }
 }
