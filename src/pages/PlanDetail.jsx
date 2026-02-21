@@ -337,6 +337,8 @@ export default function PlanDetail() {
                     </>
                   )}
                 </motion.button>
+              </div>
+              </div>
 
             {/* Travel Tips */}
             {itinerary.travelTips && itinerary.travelTips.length > 0 && (
@@ -394,5 +396,6 @@ export default function PlanDetail() {
 
       <WhatIfDrawer isOpen={showWhatIf} onClose={() => setShowWhatIf(false)} />
     </motion.div>
+    
   )
 }
