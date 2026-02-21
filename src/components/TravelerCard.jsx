@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import './TravelerCard.css'
 
-const budgetTypes = ['Budget', 'Moderate', 'Splurge']
 const interests = ['Food', 'Adventure', 'History', 'Nightlife', 'Nature', 'Beaches', 'Wellness']
 const avatarColors = ['#E8631A', '#4A9EDB', '#E8A21A', '#6B9E4A', '#C44A6B', '#7A5CE8']
 
@@ -22,12 +21,14 @@ const TravelerCard = ({ traveler, index, onUpdate, onRemove }) => {
     setEditingName(false)
   }
 
-  const handleEnergyLevel = (level) => {
-    onUpdate({ ...traveler, energyLevel: level })
-  }
-
-  const handleBudgetType = (type) => {
-    onUpdate({ ...traveler, budgetType: type })
+  const handleAgeChange = (e) => {
+    const age = parseInt(e.target.value, 10)
+    if (!isNaN(age) && age >= 0) {
+      onUpdate({ ...traveler, age })
+    } else if (e.target.value === '') {
+      // Allow clearing the input temporarily
+      onUpdate({ ...traveler, age: '' })
+    }
   }
 
   const handleInterests = (interest) => {
@@ -85,37 +86,17 @@ const TravelerCard = ({ traveler, index, onUpdate, onRemove }) => {
 
       <div className="card-divider" />
 
-      <div className="energy-section">
-        <label className="section-label">ENERGY LEVEL</label>
-        <div className="energy-buttons">
-          {[1, 2, 3, 4, 5].map((level) => (
-            <motion.button
-              type="button"
-              key={level}
-              className={`energy-btn ${traveler.energyLevel === level ? 'active' : ''}`}
-              onClick={() => handleEnergyLevel(level)}
-              whileTap={{ scale: 0.95 }}
-            >
-              {level}
-            </motion.button>
-          ))}
-        </div>
-      </div>
-
-      <div className="budget-section">
-        <label className="section-label">BUDGET TYPE</label>
-        <div className="budget-chips">
-          {budgetTypes.map((type) => (
-            <motion.button
-              type="button"
-              key={type}
-              className={`budget-chip ${traveler.budgetType === type ? 'active' : ''}`}
-              onClick={() => handleBudgetType(type)}
-              whileHover={{ scale: 1.05 }}
-            >
-              {type}
-            </motion.button>
-          ))}
+      <div className="age-section">
+        <label className="section-label">AGE</label>
+        <div className="age-input-container">
+          <input
+            type="number"
+            className="age-input"
+            value={traveler.age || ''}
+            onChange={handleAgeChange}
+            min="0"
+            max="120"
+          />
         </div>
       </div>
 

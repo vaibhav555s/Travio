@@ -52,18 +52,53 @@
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
+  width: 100%;
   height: var(--nav-height);
-  background: transparent;
-  backdrop-filter: none;
+  background-color: rgba(0, 0, 0, 0.3);
+  /* User requested black/30 overlay */
+  backdrop-filter: blur(12px);
+  /* User requested backdrop-blur-md */
+  -webkit-backdrop-filter: blur(12px);
   z-index: 1000;
   transition: all var(--transition-base) var(--ease-out);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  /* Subtle glass border */
 }
 
+/* Base states before scrolling */
+.navbar .nav-logo {
+  color: var(--color-white);
+}
+
+.navbar .nav-link {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+}
+
+.navbar .nav-sign-in {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+}
+
+/* Scrolled state overriding white text back to dark */
 .navbar.scrolled {
-  background: var(--color-glass);
-  backdrop-filter: blur(10px);
-  box-shadow: var(--shadow-md);
+  background-color: rgba(255, 255, 255, 0.95);
+  box-shadow: var(--shadow-sm);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.navbar.scrolled .nav-logo {
+  color: var(--color-accent);
+}
+
+.navbar.scrolled .nav-link,
+.navbar.scrolled .nav-sign-in {
+  color: var(--color-text-secondary);
+}
+
+.navbar.scrolled .nav-link:hover,
+.navbar.scrolled .nav-sign-in:hover {
+  color: var(--color-accent);
 }
 
 .nav-container {
@@ -113,7 +148,8 @@
 }
 
 .nav-link:hover {
-  color: var(--color-accent);
+  color: var(--color-white);
+  /* Keeps text white on hover in top state */
 }
 
 .nav-link:hover::after {

@@ -17,6 +17,52 @@
 .budget-amount {
   color: var(--color-accent);
   font-weight: 600;
+  cursor: text;
+  border-bottom: 2px solid transparent;
+  display: inline-block;
+  transition: border-color var(--transition-fast);
+}
+
+.budget-amount:hover {
+  border-bottom-color: rgba(217, 119, 6, 0.3);
+}
+
+.budget-input-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.budget-currency-symbol {
+  color: var(--color-accent);
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.budget-amount-input {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid var(--color-accent);
+  color: var(--color-accent);
+  font-weight: 600;
+  outline: none;
+  width: 150px;
+  text-align: center;
+  padding: 0;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* Hide number spinner controls */
+.budget-amount-input::-webkit-outer-spin-button,
+.budget-amount-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.budget-amount-input[type=number] {
+  -moz-appearance: textfield;
+  appearance: textfield;
 }
 
 .budget-label {

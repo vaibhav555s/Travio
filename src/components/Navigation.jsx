@@ -75,8 +75,8 @@ const Navigation = () => {
   return (
     <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
       <div className="nav-container">
-        <Link to="/" className="nav-logo text-display">
-          Radiator
+        <Link to="/" className="nav-logo text-title">
+          Radiator Routes
         </Link>
 
         <div className="nav-menu">

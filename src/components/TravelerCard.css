@@ -100,52 +100,39 @@
   margin-bottom: var(--spacing-md);
 }
 
-.energy-section,
-.budget-section,
+.age-section,
 .interests-section {
   margin-bottom: var(--spacing-lg);
 }
 
-.energy-buttons {
-  display: flex;
-  gap: var(--spacing-sm);
-  flex-wrap: wrap;
-}
-
-.energy-btn {
-  width: 36px;
-  height: 36px;
-  border: 1.5px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  background: white;
-  color: var(--color-text-primary);
-  font-size: var(--text-label);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast) var(--ease-out);
+.age-input-container {
   display: flex;
   align-items: center;
-  justify-content: center;
 }
 
-.energy-btn:hover {
+.age-input {
+  width: 100px;
+  max-width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-body-sm);
+  color: var(--color-text-primary);
+  outline: none;
+  transition: all var(--transition-fast) var(--ease-out);
+}
+
+.age-input:focus {
   border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-pale);
 }
 
-.energy-btn.active {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  color: white;
-}
-
-.budget-chips,
 .interests-chips {
   display: flex;
   gap: var(--spacing-sm);
   flex-wrap: wrap;
 }
 
-.budget-chip,
 .interest-chip {
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-pill);
@@ -158,13 +145,11 @@
   transition: all var(--transition-fast) var(--ease-out);
 }
 
-.budget-chip:hover,
 .interest-chip:hover {
   border-color: var(--color-accent);
   background: var(--color-accent-pale);
 }
 
-.budget-chip.active,
 .interest-chip.active {
   background: var(--color-accent);
   border-color: var(--color-accent);
@@ -186,17 +171,6 @@
     font-size: var(--text-label);
   }
 
-  .energy-buttons {
-    gap: var(--spacing-xs);
-  }
-
-  .energy-btn {
-    width: 32px;
-    height: 32px;
-    font-size: var(--text-caption);
-  }
-
-  .budget-chip,
   .interest-chip {
     font-size: var(--text-caption);
     padding: var(--spacing-xs) var(--spacing-sm);
