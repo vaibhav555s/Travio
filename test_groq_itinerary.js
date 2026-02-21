@@ -4,38 +4,38 @@ import dotenv from 'dotenv'
 dotenv.config({ path: './.env' })
 
 const openai = new OpenAI({
-    apiKey: process.env.GROK_API_KEY,
-    baseURL: 'https://api.groq.com/openai/v1',
+  apiKey: process.env.GROK_API_KEY,
+  baseURL: 'https://api.groq.com/openai/v1',
 })
 
 const GROK_MODEL = 'llama-3.3-70b-versatile'
 
 function extractJSON(text) {
-    try {
-        let clean = text.replace(/```(?:json)?\n?/gi, '').replace(/```/g, '').trim()
-        const startIndex = clean.indexOf('{')
-        const endIndex = clean.lastIndexOf('}')
-        if (startIndex !== -1 && endIndex !== -1) {
-            clean = clean.substring(startIndex, endIndex + 1)
-        }
-        return JSON.parse(clean)
-    } catch (err) {
-        console.error("Failed to parse JSON:", err.message)
-        console.error("Raw text was:", text)
-        throw new Error("Llama output was not valid JSON")
+  try {
+    let clean = text.replace(/```(?:json)?\n?/gi, '').replace(/```/g, '').trim()
+    const startIndex = clean.indexOf('{')
+    const endIndex = clean.lastIndexOf('}')
+    if (startIndex !== -1 && endIndex !== -1) {
+      clean = clean.substring(startIndex, endIndex + 1)
     }
+    return JSON.parse(clean)
+  } catch (err) {
+    console.error("Failed to parse JSON:", err.message)
+    console.error("Raw text was:", text)
+    throw new Error("Llama output was not valid JSON")
+  }
 }
 
 async function testItinerary() {
-    const days = 3;
-    const source = "Mumbai";
-    const destination = "Manali";
-    const budget = "25000";
-    const travelers = 2;
-    const vibes = ["Nature", "Adventure"];
-    const style = "Balanced and comfortable - mix of sightseeing, food, relaxation";
+  const days = 3;
+  const source = "Mumbai";
+  const destination = "Manali";
+  const budget = "25500";
+  const travelers = 2;
+  const vibes = ["Nature", "Adventure"];
+  const style = "Balanced and comfortable - mix of sightseeing, food, relaxation";
 
-    const prompt = `You are an expert Indian travel planner. Generate a detailed ${days}-day itinerary.
+  const prompt = `You are an expert Indian travel planner. Generate a detailed ${days}-day itinerary.
 
 Trip Parameters:
 - Starting From: ${source || 'Not specified'}
@@ -70,19 +70,19 @@ Return ONLY valid JSON (no markdown, no explanation) with this exact structure:
 
 Rules: Include exactly ${days} day objects. Each day: 3-5 activities, real 24h times. Costs in INR using Rs. symbol. estimatedTotalBudget = total for all ${travelers} travelers. travelTips must be specific to ${destination}.`
 
-    try {
-        const completion = await openai.chat.completions.create({
-            model: GROK_MODEL,
-            messages: [{ role: 'user', content: prompt }],
-            temperature: 0.7,
-        })
-        const text = completion.choices[0].message.content
-        console.log("Raw Text snippet:", text.substring(0, 500))
-        const json = extractJSON(text)
-        console.log("Parsed JSON:", JSON.stringify(json, null, 2))
-    } catch (err) {
-        console.error("Error:", err)
-    }
+  try {
+    const completion = await openai.chat.completions.create({
+      model: GROK_MODEL,
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.7,
+    })
+    const text = completion.choices[0].message.content
+    console.log("Raw Text snippet:", text.substring(0, 500))
+    const json = extractJSON(text)
+    console.log("Parsed JSON:", JSON.stringify(json, null, 2))
+  } catch (err) {
+    console.error("Error:", err)
+  }
 }
 
 testItinerary()

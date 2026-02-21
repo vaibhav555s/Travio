@@ -11,7 +11,7 @@ const messages = [
   'Building 3 distinct routes...',
 ]
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5500'
 
 const Processing = () => {
   const navigate = useNavigate()
@@ -59,41 +59,41 @@ const Processing = () => {
 
     // Call Gemini via backend
     // Processing.jsx - update fetchOptions function
-const fetchOptions = async () => {
-  try {
-    const saved = sessionStorage.getItem('tripSetupData')
-    const tripData = saved ? JSON.parse(saved) : {}
-    const token = localStorage.getItem('accessToken')
+    const fetchOptions = async () => {
+      try {
+        const saved = sessionStorage.getItem('tripSetupData')
+        const tripData = saved ? JSON.parse(saved) : {}
+        const token = localStorage.getItem('accessToken')
 
-    const response = await fetch(`${API_URL}/api/itinerary/generate-options`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token && { Authorization: `Bearer ${token}` })
-      },
-      body: JSON.stringify(tripData),
-    })
+        const response = await fetch(`${API_URL}/api/itinerary/generate-options`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token && { Authorization: `Bearer ${token}` })
+          },
+          body: JSON.stringify(tripData),
+        })
 
-    if (!response.ok) {
-      const err = await response.json()
-      throw new Error(err.error || 'Server error')
+        if (!response.ok) {
+          const err = await response.json()
+          throw new Error(err.error || 'Server error')
+        }
+
+        const data = await response.json()
+        if (data.tripId) {
+          const updatedTripData = { ...tripData, tripId: data.tripId }
+          sessionStorage.setItem('tripSetupData', JSON.stringify(updatedTripData))
+        }
+
+        sessionStorage.setItem('generatedOptions', JSON.stringify(data.options || []))
+
+        setProgress(100)
+        setTimeout(() => navigate('/plans'), 500)
+      } catch (err) {
+        console.error('Processing error:', err)
+        setError(err.message || 'Something went wrong. Please try again.')
+      }
     }
-
-    const data = await response.json()
-    if (data.tripId) {
-      const updatedTripData = { ...tripData, tripId: data.tripId }
-      sessionStorage.setItem('tripSetupData', JSON.stringify(updatedTripData))
-    }
-
-    sessionStorage.setItem('generatedOptions', JSON.stringify(data.options || []))
-
-    setProgress(100)
-    setTimeout(() => navigate('/plans'), 500)
-  } catch (err) {
-    console.error('Processing error:', err)
-    setError(err.message || 'Something went wrong. Please try again.')
-  }
-}
 
     fetchOptions()
 

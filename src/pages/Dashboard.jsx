@@ -5,7 +5,7 @@ import CrewChat from '../components/CrewChat'
 import Toast from '../components/Toast'
 import { mockPlans } from '../data/mockPlans'
 import './Dashboard.css'
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5500'
 export default function Dashboard() {
   const [showCrewChat, setShowCrewChat] = useState(false)
   const [toast, setToast] = useState(null)

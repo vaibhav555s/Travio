@@ -4,9 +4,10 @@ import { motion, AnimatePresence } from 'framer-motion'
 import ActivityCard from '../components/ActivityCard'
 import WhatIfDrawer from '../components/WhatIfDrawer'
 import MetricBar from '../components/MetricBar'
+import CollaboratorModal from '../components/CollaboratorModal'
 import './PlanDetail.css'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5500'
 
 const ACCENTS = {
   recommended: '#E8631A',
@@ -48,6 +49,7 @@ export default function PlanDetail() {
   const [isRefining, setIsRefining] = useState(false)
   const [refinedPlan, setRefinedPlan] = useState(null)
   const [refineError, setRefineError] = useState('')
+  const [showCollabModal, setShowCollabModal] = useState(false)
 
   // ── Derived Data ──
   const savedOptions = sessionStorage.getItem('generatedOptions')
@@ -62,6 +64,15 @@ export default function PlanDetail() {
     try { return JSON.parse(sessionStorage.getItem('tripSetupData') || '{}') } catch { return {} }
   })()
   const totalPeople = tripData.travelers || 1
+  const tripId = tripData.tripId || originalPlan?.tripId || null
+  const currentUserId = (() => {
+    try {
+      const token = localStorage.getItem('accessToken')
+      if (!token) return null
+      const payload = JSON.parse(atob(token.split('.')[1]))
+      return payload.id || payload._id || payload.sub || null
+    } catch { return null }
+  })()
 
   // ── Fetch Initial Itinerary ──
   useEffect(() => {
@@ -348,7 +359,20 @@ export default function PlanDetail() {
               <div className="pd-divider" />
 
               <div className="pd-crew">
-                <div className="pd-section-label">YOUR CREW</div>
+                <div className="pd-crew-header">
+                  <div className="pd-section-label">TRIP CREW</div>
+                  <motion.button
+                    className="pd-invite-btn"
+                    onClick={() => setShowCollabModal(true)}
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.96 }}
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                    Invite
+                  </motion.button>
+                </div>
                 <div className="pd-avatars">
                   {['AR', 'PR', 'VK', 'ME'].slice(0, Math.min(4, totalPeople)).map((initials, idx) => (
                     <div
@@ -482,6 +506,13 @@ export default function PlanDetail() {
       </div>
 
       <WhatIfDrawer isOpen={showWhatIf} onClose={() => setShowWhatIf(false)} />
+
+      <CollaboratorModal
+        isOpen={showCollabModal}
+        onClose={() => setShowCollabModal(false)}
+        tripId={tripId}
+        isOwner={true}
+      />
     </motion.div>
   )
 }

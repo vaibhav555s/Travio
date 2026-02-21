@@ -17,9 +17,9 @@ export const createTrip = async (req, res) => {
       departureDate,
       returnDate,
       budget,
-      vibes:     vibes || [],
+      vibes: vibes || [],
       travelers: travelers || [],
-      status:    'planning',
+      status: 'planning',
     })
 
     // Link to user
@@ -54,8 +54,14 @@ export const getTripById = async (req, res) => {
       return res.status(404).json({ message: 'Trip not found' })
     }
 
-    // Ensure trip belongs to requesting user
-    if (trip.userId.toString() !== req.user.id) {
+    // Allow: trip owner OR accepted collaborator
+    const requesterId = req.user.id
+    const tripOwner = trip.userId.toString() === requesterId
+    const isCollab = trip.collaborators.some(
+      c => c.userId?.toString() === requesterId && c.status === 'accepted'
+    )
+
+    if (!tripOwner && !isCollab) {
       return res.status(403).json({ message: 'Not authorized' })
     }
 
