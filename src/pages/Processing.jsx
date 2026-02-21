@@ -15,8 +15,25 @@ const Processing = () => {
   const navigate = useNavigate()
   const [messageIndex, setMessageIndex] = useState(0)
   const [progress, setProgress] = useState(0)
+  const [tripInfo, setTripInfo] = useState({ travelers: 1, destination: 'your destination', days: 1 })
 
   useEffect(() => {
+    const saved = sessionStorage.getItem('tripSetupData')
+    if (saved) {
+      const data = JSON.parse(saved)
+      let calculatedDays = 1
+      if (data.departureDate && data.returnDate) {
+        const start = new Date(data.departureDate)
+        const end = new Date(data.returnDate)
+        const diffTime = Math.abs(end - start)
+        calculatedDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1
+      }
+      setTripInfo({
+        travelers: data.travelers || 1,
+        destination: data.destination || 'your destination',
+        days: calculatedDays
+      })
+    }
     const messageTimer = setInterval(() => {
       setMessageIndex((prev) => (prev + 1) % messages.length)
     }, 700)
@@ -93,7 +110,7 @@ const Processing = () => {
         </motion.div>
 
         <div className="processing-details">
-          <span>Analyzing 4 traveler profiles · Goa · 5 days</span>
+          <span>Analyzing {tripInfo.travelers} traveler profile{tripInfo.travelers > 1 ? 's' : ''} · {tripInfo.destination} · {tripInfo.days} day{tripInfo.days > 1 ? 's' : ''}</span>
         </div>
 
         <div className="progress-bar">

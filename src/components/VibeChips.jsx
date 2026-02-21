@@ -41,6 +41,7 @@ const VibeChips = ({ selected, onChange }) => {
 
           return (
             <motion.button
+              type="button"
               key={vibe.id}
               onClick={() => handleToggle(vibe.id)}
               className={`vibe-chip ${isSelected ? 'selected' : ''}`}
@@ -52,21 +53,10 @@ const VibeChips = ({ selected, onChange }) => {
                 duration: 0.3,
               }}
             >
-              {isSelected && (
-                <motion.div
-                  className="chip-bg"
-                  layoutId="chipBg"
-                  transition={{
-                    type: 'spring',
-                    stiffness: 300,
-                    damping: 30,
-                  }}
-                />
-              )}
 
               <Icon
                 size={24}
-                color={isSelected ? 'white' : 'var(--color-accent)'}
+                color={'var(--color-accent)'}
               />
               <span className="text-body-sm chip-label">
                 {vibe.label}
