@@ -6,12 +6,32 @@ import WhatIfDrawer from '../components/WhatIfDrawer'
 import MetricBar from '../components/MetricBar'
 import './PlanDetail.css'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+
+const ACCENTS = {
+  recommended:    '#E8631A',
+  high_energy:    '#C44A6B',
+  budget_friendly:'#4A9E6B',
+}
+
+const PHOTOS = {
+  recommended:    'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80',
+  high_energy:    'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80',
+  budget_friendly:'https://images.unsplash.com/photo-1490730141103-6cac27aaab94?auto=format&fit=crop&w=1200&q=80',
+}
+
+const TITLES = {
+  recommended:    'Recommended Route',
+  high_energy:    'High Energy Adventure',
+  budget_friendly:'Budget Friendly Plan',
+}
+
 const dayThemes = [
-  { gradient: 'linear-gradient(135deg, #f09819 0%, #ff5858 100%)' }, // Tangerine to Red
-  { gradient: 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)' }, // Amber to Peach
-  { gradient: 'linear-gradient(135deg, #f5af19 0%, #f12711 100%)' }, // Deep Orange to Coral
-  { gradient: 'linear-gradient(135deg, #ff9a44 0%, #fc6076 100%)' }, // Orange to Pinkish
-  { gradient: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)' }, // Soft Peach
+  { gradient: 'linear-gradient(135deg, #f09819 0%, #ff5858 100%)' },
+  { gradient: 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)' },
+  { gradient: 'linear-gradient(135deg, #f5af19 0%, #f12711 100%)' },
+  { gradient: 'linear-gradient(135deg, #ff9a44 0%, #fc6076 100%)' },
+  { gradient: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)' },
 ]
 
 export default function PlanDetail() {
@@ -22,10 +42,11 @@ export default function PlanDetail() {
   const savedOptions = sessionStorage.getItem('generatedOptions')
   const options = savedOptions ? JSON.parse(savedOptions) : []
   const originalPlan = options.find(p => p.id === planId) || options[0]
+  const navigate   = useNavigate()
 
-  const [itinerary, setItinerary] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [itinerary, setItinerary]   = useState(null)
+  const [loading, setLoading]       = useState(true)
+  const [error, setError]           = useState(null)
   const [selectedDay, setSelectedDay] = useState(1)
   const [showWhatIf, setShowWhatIf] = useState(false)
 
@@ -89,8 +110,7 @@ export default function PlanDetail() {
   // Refinement state
   const [editPrompt, setEditPrompt] = useState('')
   const [isRefining, setIsRefining] = useState(false)
-  const [refinedPlan, setRefinedPlan] = useState(null)
-  const [refineError, setRefineError] = useState('')
+  const [refinedPlan, setRefinedPlan] = useState(false)
 
   const handleRefine = async () => {
     if (!editPrompt.trim()) return
@@ -111,19 +131,133 @@ export default function PlanDetail() {
       if (!res.ok) throw new Error(data.error || 'Something went wrong.')
       setRefinedPlan(data.refinedPlan)
       setSelectedDay(data.refinedPlan.days?.[0]?.day || 1)
+  const accent   = ACCENTS[planId] || '#E8631A'
+  const photo    = PHOTOS[planId]  || PHOTOS.recommended
+  const title    = TITLES[planId]  || 'Your Itinerary'
+  const dayTheme = dayThemes[(selectedDay - 1) % dayThemes.length]
+
+  const tripData   = (() => {
+    try { return JSON.parse(sessionStorage.getItem('tripSetupData') || '{}') } catch { return {} }
+  })()
+  const totalPeople = tripData.travelers || 1
+
+  // ── Fetch Itinerary ──
+  useEffect(() => {
+    const fetchItinerary = async () => {
+      try {
+        const originalTripData = tripData
+
+        const savedOptions  = sessionStorage.getItem('generatedOptions')
+        const options       = savedOptions ? JSON.parse(savedOptions) : []
+        const matchedOption = options.find(o => o.id === planId)
+        const token         = localStorage.getItem('accessToken')
+
+        console.log('Sending to generate-itinerary:', {
+          tripId: originalTripData.tripId,
+          planId: matchedOption?.planId,
+          matchedOption,
+        })
+
+        const response = await fetch(`${API_URL}/api/itinerary/generate-itinerary`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token && { Authorization: `Bearer ${token}` })
+          },
+          body: JSON.stringify({
+            selectedOptionId: planId,
+            originalTripData,
+            tripId: originalTripData.tripId || matchedOption?.tripId,
+            planId: matchedOption?.planId,
+          }),
+        })
+
+        if (!response.ok) {
+          const err = await response.json()
+          throw new Error(err.error || 'Server error')
+        }
+
+        const data = await response.json()
+        setItinerary(data)
+
+        if (data.itineraryId) {
+          sessionStorage.setItem('itineraryId', data.itineraryId)
+        }
+
+        setSelectedDay(data.dailyPlan?.[0]?.day || 1)
+      } catch (err) {
+        console.error('[PlanDetail] Error:', err)
+        setError(err.message || 'Failed to load itinerary.')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchItinerary()
+  }, [planId])
+
+  // ── Select Route ──
+  const handleSelectRoute = async () => {
+    try {
+      const savedOptions  = sessionStorage.getItem('generatedOptions')
+      const options       = savedOptions ? JSON.parse(savedOptions) : []
+      const matchedOption = options.find(o => o.id === planId)
+      const token         = localStorage.getItem('accessToken')
+
+      if (matchedOption?.planId && token) {
+        await fetch(`${API_URL}/api/plans/${matchedOption.planId}/select`, {
+          method: 'PATCH',
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      }
+      navigate('/dashboard')
     } catch (err) {
-      setRefineError(err.message)
+      console.error('Failed to select plan:', err)
+      navigate('/dashboard')
+    }
+  }
+
+  // ── AI Refine ──
+  const handleRefine = async () => {
+    if (!editPrompt.trim()) return
+    setIsRefining(true)
+    try {
+      // placeholder for refine API call
+      await new Promise(r => setTimeout(r, 1500))
+      setRefinedPlan(true)
+      setEditPrompt('')
+    } catch (err) {
+      console.error('Refine error:', err)
     } finally {
       setIsRefining(false)
     }
   }
 
-  const handleReset = () => {
-    setRefinedPlan(null)
-    setEditPrompt('')
-    setRefineError('')
-    setSelectedDay(1)
-  }
+  // ── Loading ──
+  if (loading) return (
+    <div className="plan-detail" style={{ display:'flex', alignItems:'center', justifyContent:'center', minHeight:'100vh', flexDirection:'column', gap:'1rem' }}>
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+        style={{ width:48, height:48, border:`3px solid ${accent}`, borderTopColor:'transparent', borderRadius:'50%' }}
+      />
+      <p style={{ color:'var(--color-text-secondary)', fontSize:'1rem' }}>Generating your day-by-day itinerary…</p>
+    </div>
+  )
+
+  // ── Error ──
+  if (error) return (
+    <div className="plan-detail" style={{ display:'flex', alignItems:'center', justifyContent:'center', minHeight:'100vh', flexDirection:'column', gap:'1rem', textAlign:'center', padding:'2rem' }}>
+      <p style={{ fontSize:'3rem' }}>⚠️</p>
+      <h2>Could not load itinerary</h2>
+      <p style={{ color:'var(--color-text-secondary)' }}>{error}</p>
+      <button onClick={() => navigate('/plans')} style={{ background:accent, color:'white', border:'none', borderRadius:'100px', padding:'12px 24px', fontSize:'1rem', cursor:'pointer', marginTop:'1rem' }}>
+        ← Back to routes
+      </button>
+    </div>
+  )
+
+  const currentDayData = itinerary.dailyPlan?.find(d => d.day === selectedDay) || itinerary.dailyPlan?.[0]
 
   // Render Loader
   if (loading) {
@@ -164,7 +298,7 @@ export default function PlanDetail() {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.4 }}
     >
-      {/* ── Animated Aesthetic Background ── */}
+      {/* Animated Background */}
       <div className="pd-animated-bg">
         <div className="pd-blob pd-blob-1" style={{ background: dayTheme.gradient }} />
         <div className="pd-blob pd-blob-2" style={{ background: dayTheme.gradient }} />
@@ -172,8 +306,9 @@ export default function PlanDetail() {
       </div>
 
       <div className="pd-content-wrapper">
-        {/* ── Immersive Hero ── */}
-        <div className="pd-hero" style={{ backgroundImage: `url(${plan.photo})` }}>
+
+        {/* Hero */}
+        <div className="pd-hero" style={{ backgroundImage: `url(${photo})` }}>
           <div className="pd-hero-overlay" />
           <div className="pd-hero-content">
             <button className="pd-back-btn" onClick={() => navigate('/plans')}>
@@ -182,38 +317,25 @@ export default function PlanDetail() {
               </svg>
               <span>All routes</span>
             </button>
-
             <div className="pd-hero-text">
-              {plan.badge && <span className="pd-badge">{plan.badge}</span>}
-              <h1 className="pd-title">{plan.name}</h1>
-              <p className="pd-tagline">{plan.tagline}</p>
+              {refinedPlan && <span className="pd-badge">AI Refined</span>}
+              <h1 className="pd-title">{title}</h1>
+              <p className="pd-tagline">{itinerary.tripSummary?.slice(0, 100)}...</p>
             </div>
-
             <div className="pd-hero-pills">
-              <div className="pd-pill">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
-                {plan.nights} nights
-              </div>
-              <div className="pd-pill">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" /></svg>
-                {totalPeople} travelers
-              </div>
-              <div className="pd-pill">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 100 7h5a3.5 3.5 0 110 7H6" /></svg>
-                {plan.totalCost}
-              </div>
+              <div className="pd-pill">{itinerary.dailyPlan?.length || 0} nights</div>
+              <div className="pd-pill">{totalPeople} travelers</div>
+              <div className="pd-pill">{itinerary.estimatedTotalBudget}</div>
               {refinedPlan && <div className="pd-pill pd-pill-ai">✦ AI Refined</div>}
             </div>
           </div>
         </div>
 
-        {/* ── Main Layout ── */}
+        {/* Main Layout */}
         <div className="pd-main">
 
-          {/* LEFT: Itinerary Column */}
+          {/* LEFT: Itinerary */}
           <div className="pd-left">
-
-            {/* Day Selector — Editorial Style */}
             <div className="editorial-day-nav">
               <span className="edn-label">Daily Itinerary</span>
               <div className="edn-tabs">
@@ -232,11 +354,21 @@ export default function PlanDetail() {
                     </motion.button>
                   )
                 })}
+                {itinerary.dailyPlan?.map((day) => (
+                  <motion.button
+                    key={day.day}
+                    className={`edn-tab ${selectedDay === day.day ? 'active' : ''}`}
+                    onClick={() => setSelectedDay(day.day)}
+                    whileHover={{ y: -2 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    {day.day < 10 ? `0${day.day}` : day.day}
+                  </motion.button>
+                ))}
               </div>
               <div className="edn-line" />
             </div>
 
-            {/* Day Header — High-End Typography */}
             <AnimatePresence mode="wait">
               <motion.div
                 key={`header-${selectedDay}`}
@@ -249,13 +381,12 @@ export default function PlanDetail() {
                 <div className="edh-meta">
                   <span className="edh-day-label">DAY {selectedDay}</span>
                   <span className="edh-dot" />
-                  <span className="edh-stops">{currentDayData.activities.length} curated experiences</span>
+                  <span className="edh-stops">{currentDayData?.activities?.length || 0} curated experiences</span>
                 </div>
-                <h2 className="edh-title">{currentDayData.title || 'Today\'s Journey'}</h2>
+                <h2 className="edh-title">{currentDayData?.title || "Today's Journey"}</h2>
               </motion.div>
             </AnimatePresence>
 
-            {/* Activities Timeline */}
             <AnimatePresence mode="wait">
               <motion.div
                 key={`activities-${selectedDay}`}
@@ -296,30 +427,54 @@ export default function PlanDetail() {
                     <p>{plan.aiNote}</p>
                   </div>
                 )}
+                {currentDayData?.activities?.map((activity, idx) => (
+                  <ActivityCard
+                    key={idx}
+                    activity={{
+                      time:     activity.time,
+                      name:     activity.activity,
+                      type:     'activity',
+                      energy:   'Medium',
+                      cost:     activity.costEstimate,
+                      location: activity.location,
+                    }}
+                    connector={idx < currentDayData.activities.length - 1}
+                    index={idx}
+                    themeGradient={dayTheme.gradient}
+                  />
+                ))}
+
+                <div className="pd-ai-note">
+                  <div className="pd-ai-note-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M12 2a10 10 0 110 20 10 10 0 010-20zm0 6v4m0 4h.01" />
+                    </svg>
+                  </div>
+                  <p>{itinerary.tripSummary}</p>
+                </div>
               </motion.div>
             </AnimatePresence>
           </div>
 
-          {/* RIGHT: Sticky Summary Panel */}
+          {/* RIGHT: Sticky Panel */}
           <div className="pd-right">
             <div className="pd-summary-card">
-              {/* Cost section */}
               <div className="pd-cost-section">
                 <div className="pd-cost-label">TOTAL TRIP COST</div>
-                <div className="pd-cost-amount">{plan.totalCost}</div>
-                <div className="pd-cost-per">₹{(32000 / totalPeople).toLocaleString()} per person</div>
+                <div className="pd-cost-amount">{itinerary.estimatedTotalBudget}</div>
+                <div className="pd-cost-per">for {totalPeople} traveler{totalPeople > 1 ? 's' : ''}</div>
               </div>
 
               <div className="pd-divider" />
 
-              {/* Highlights */}
-              {plan.highlights && (
+              {/* Travel Tips */}
+              {itinerary.travelTips?.length > 0 && (
                 <div className="pd-highlights">
-                  <div className="pd-section-label">HIGHLIGHTS</div>
-                  {plan.highlights.map((h, i) => (
+                  <div className="pd-section-label">TRAVEL TIPS</div>
+                  {itinerary.travelTips.map((tip, i) => (
                     <div key={i} className="pd-highlight-item">
                       <div className="pd-highlight-dot" style={{ animationDelay: `${i * 0.3}s` }} />
-                      <span>{h}</span>
+                      <span>{tip}</span>
                     </div>
                   ))}
                 </div>
@@ -359,12 +514,11 @@ export default function PlanDetail() {
               {/* CTAs */}
               <motion.button
                 className="pd-btn-primary"
-                onClick={() => navigate('/dashboard')}
+                onClick={handleSelectRoute}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
-                Select this route
+                Select this route →
               </motion.button>
 
               <motion.button
@@ -373,14 +527,13 @@ export default function PlanDetail() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
                 Tweak this route
               </motion.button>
             </div>
           </div>
         </div>
 
-        {/* ── AI Refine Section ── */}
+        {/* AI Refine Section */}
         <div className="itinerary-refine-wrapper">
           <motion.section
             className="itinerary-refine-section"
@@ -392,16 +545,10 @@ export default function PlanDetail() {
               <span className="refine-sparkle">✦</span>
               <div>
                 <h2 className="refine-title">Tweak this itinerary</h2>
-                <p className="refine-subtitle">
-                  Describe any changes in plain English — Gemini will update the plan for you instantly.
-                </p>
+                <p className="refine-subtitle">Describe any changes in plain English — Gemini will update the plan instantly.</p>
               </div>
               {refinedPlan && (
-                <motion.span
-                  className="refine-badge"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                >
+                <motion.span className="refine-badge" initial={{ opacity:0, scale:0.8 }} animate={{ opacity:1, scale:1 }}>
                   AI Updated
                 </motion.span>
               )}
@@ -411,18 +558,15 @@ export default function PlanDetail() {
               <div className="refine-textarea-wrap">
                 <textarea
                   className="refine-textarea"
-                  placeholder='e.g. "Replace the beach walk with a yoga session on Day 1" or "Add a cooking class on Day 2 evening"'
+                  placeholder='e.g. "Replace the beach walk with a yoga session on Day 1"'
                   value={editPrompt}
                   onChange={e => setEditPrompt(e.target.value)}
                   rows={3}
                   disabled={isRefining}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) handleRefine()
-                  }}
+                  onKeyDown={e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) handleRefine() }}
                 />
                 <div className="refine-textarea-hint">⌘ + Enter to apply</div>
               </div>
-
               <div className="refine-actions">
                 <motion.button
                   className={`refine-submit-btn ${isRefining ? 'loading' : ''}`}

@@ -6,6 +6,7 @@ import BudgetSlider from '../components/BudgetSlider'
 import TravelerStepper from '../components/TravelerStepper'
 import VibeChips from '../components/VibeChips'
 import { MapPinIcon, CalendarIcon, ArrowRightIcon } from '../components/SVGIcons'
+import axios from 'axios'
 import './TripSetup.css'
 
 const majorCities = [
@@ -132,6 +133,7 @@ const TripSetup = () => {
 
     setErrors({})
     navigate('/crew')
+
   }
 
   const progressSteps = [

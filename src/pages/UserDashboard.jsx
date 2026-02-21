@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import TripCard from '../components/TripCard'
 import TeamCard from '../components/TeamCard'
+import {useState,useEffect} from "react"
 import './UserDashboard.css'
 
 const mockRecentTrips = [
@@ -27,6 +28,31 @@ const fadeUp = {
 export default function UserDashboard() {
     const { user } = useAuth()
     const navigate = useNavigate()
+    const [recentTrips, setRecentTrips] = useState([])
+const [tripsLoading, setTripsLoading] = useState(true)
+
+useEffect(() => {
+  const fetchTrips = async () => {
+    try {
+      const token = localStorage.getItem('accessToken')
+      if (!token) return
+
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/trips`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
+      if (res.ok) {
+        const data = await res.json()
+        setRecentTrips(data)
+      }
+    } catch (err) {
+      console.error('Failed to fetch trips:', err)
+    } finally {
+      setTripsLoading(false)
+    }
+  }
+  fetchTrips()
+}, [])
 
     const tripSetup = (() => {
         try { return JSON.parse(sessionStorage.getItem('tripSetupData') || '{}') } catch { return {} }
@@ -93,22 +119,35 @@ export default function UserDashboard() {
 
                 {/* ── Recent Trips (staggered) ── */}
                 <motion.div variants={fadeUp} initial="hidden" animate="show" transition={{ delay: 0.18 }}>
-                    <p className="ud-section-title">Recent Trips</p>
-                    <motion.div className="ud-scroll-row" variants={stagger} initial="hidden" animate="show">
-                        {mockRecentTrips.map(trip => (
-                            <motion.div key={trip.id} variants={fadeUp}>
-                                <TripCard
-                                    destination={trip.destination}
-                                    dates={trip.dates}
-                                    budget={trip.budget}
-                                    badge={trip.badge}
-                                    teamName={trip.teamName}
-                                    onOpen={() => navigate('/plans')}
-                                />
-                            </motion.div>
-                        ))}
-                    </motion.div>
-                </motion.div>
+  <p className="ud-section-title">Recent Trips</p>
+  {tripsLoading ? (
+    <p style={{ color: 'var(--color-text-secondary)' }}>Loading trips...</p>
+  ) : recentTrips.length === 0 ? (
+    <div className="ud-empty">
+      No trips yet.{' '}
+      <button
+        style={{ background: 'none', border: 'none', color: '#E8631A', cursor: 'pointer', fontWeight: 700 }}
+        onClick={() => navigate('/setup')}
+      >
+        Plan your first trip →
+      </button>
+    </div>
+  ) : (
+    <motion.div className="ud-scroll-row" variants={stagger} initial="hidden" animate="show">
+      {recentTrips.map(trip => (
+        <motion.div key={trip._id} variants={fadeUp}>
+          <TripCard
+            destination={trip.destination}
+            dates={`${trip.departureDate?.slice(0, 10)} → ${trip.returnDate?.slice(0, 10)}`}
+            budget={Number(trip.budget).toLocaleString()}
+            badge="owner"
+            onOpen={() => navigate('/plans')}
+          />
+        </motion.div>
+      ))}
+    </motion.div>
+  )}
+</motion.div>
 
                 {/* ── Teams Snapshot (staggered) ── */}
                 <motion.div variants={fadeUp} initial="hidden" animate="show" transition={{ delay: 0.26 }}>

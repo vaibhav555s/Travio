@@ -58,33 +58,42 @@ const Processing = () => {
     const crewData = savedCrew ? JSON.parse(savedCrew) : []
 
     // Call Gemini via backend
-    const fetchOptions = async () => {
-      try {
-        const response = await fetch(`${API_URL}/api/generate-options`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...(tripData || {}), crewProfiles: crewData }),
-        })
+    // Processing.jsx - update fetchOptions function
+const fetchOptions = async () => {
+  try {
+    const saved = sessionStorage.getItem('tripSetupData')
+    const tripData = saved ? JSON.parse(saved) : {}
+    const token = localStorage.getItem('accessToken')
 
-        if (!response.ok) {
-          const err = await response.json()
-          throw new Error(err.error || 'Server error')
-        }
+    const response = await fetch(`${API_URL}/api/itinerary/generate-options`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token && { Authorization: `Bearer ${token}` })
+      },
+      body: JSON.stringify(tripData),
+    })
 
-        const data = await response.json()
-
-        // Store AI-generated options for Plans page
-        sessionStorage.setItem('generatedOptions', JSON.stringify(data.options || []))
-
-        // Complete progress bar then navigate
-        setProgress(100)
-        setTimeout(() => navigate('/plans'), 500)
-      } catch (err) {
-        console.error('Processing error:', err)
-        setError(err.message || 'Something went wrong. Please try again.')
-        clearInterval(progressTimer)
-      }
+    if (!response.ok) {
+      const err = await response.json()
+      throw new Error(err.error || 'Server error')
     }
+
+    const data = await response.json()
+    if (data.tripId) {
+      const updatedTripData = { ...tripData, tripId: data.tripId }
+      sessionStorage.setItem('tripSetupData', JSON.stringify(updatedTripData))
+    }
+
+    sessionStorage.setItem('generatedOptions', JSON.stringify(data.options || []))
+
+    setProgress(100)
+    setTimeout(() => navigate('/plans'), 500)
+  } catch (err) {
+    console.error('Processing error:', err)
+    setError(err.message || 'Something went wrong. Please try again.')
+  }
+}
 
     fetchOptions()
 
