@@ -91,6 +91,43 @@ export default function Dashboard() {
   const [aiNote, setAiNote] = useState('')
   const promptRef = useRef(null)
 
+  // ── Weather + Live Events ──
+  const [weather, setWeather] = useState(null)
+  const [weatherLoading, setWeatherLoading] = useState(false)
+  const [activeAlert, setActiveAlert] = useState(null)   // { type, title, icon, prompt }
+  const [simulating, setSimulating] = useState(null)     // which event is being processed
+  const [dismissedAlert, setDismissedAlert] = useState(false)
+
+  const LIVE_EVENTS = [
+    {
+      id: 'rain',
+      icon: '🌧️',
+      label: 'Heavy Rain',
+      color: '#3b82f6',
+      alert: '⚠️ Heavy rain forecast at your destination',
+      prompt: (dest, day) =>
+        `It is raining heavily today in ${dest}. Day ${day} has outdoor activities. Please reschedule outdoor activities to indoor alternatives, keeping the same time slots and budget range.`,
+    },
+    {
+      id: 'traffic',
+      icon: '🚗',
+      label: 'Traffic Jam',
+      color: '#f59e0b',
+      alert: '🚗 Major traffic congestion on route — 90 min delay',
+      prompt: (dest, day) =>
+        `There is a major traffic jam near ${dest} causing a 90-minute delay this morning. Please push all activities on Day ${day} forward by 90 minutes and adjust titles to reflect the delay.`,
+    },
+    {
+      id: 'flight',
+      icon: '✈️',
+      label: 'Flight Delay',
+      color: '#e8631a',
+      alert: '✈️ Flight delayed by 3 hours — arrival pushed to evening',
+      prompt: (dest, day) =>
+        `The flight to ${dest} was delayed by 3 hours. Day ${day} arrival is now evening. Please remove morning activities on Day 1 and compress the remaining ones into afternoon/evening slots.`,
+    },
+  ]
+
   // ── Fetch data ──
   useEffect(() => {
     const loadDashboard = async () => {
@@ -121,7 +158,27 @@ export default function Dashboard() {
           if (plan.aiNote) setAiNote(plan.aiNote)
         }
 
-        // 4. Fetch collaborators
+        // 4. Fetch live weather for destination
+        if (parsedMeta?.destination) {
+          setWeatherLoading(true)
+          try {
+            const wRes = await fetch(`/api/weather/${encodeURIComponent(parsedMeta.destination)}`)
+            if (wRes.ok) {
+              const wData = await wRes.json()
+              setWeather(wData)
+              // Auto-show alert banner for bad weather
+              if ((wData.severity === 'moderate' || wData.severity === 'severe') && !wData.simulated) {
+                setActiveAlert({
+                  type: 'weather',
+                  icon: wData.severity === 'severe' ? '⛈️' : '🌧️',
+                  title: `${wData.severity === 'severe' ? 'Severe weather' : 'Rain'} detected in ${wData.city} — your plan may need adjustments`,
+                  prompt: `Current weather in ${wData.city}: ${wData.condition}, ${wData.temp}°C. Some activities may be affected. Please adjust Day 1 to avoid outdoor activities that would be dangerous or uncomfortable in this weather.`,
+                })
+              }
+            }
+          } catch (e) { console.warn('[Weather] fetch failed:', e.message) }
+          finally { setWeatherLoading(false) }
+        }
         if (parsedMeta?.tripId) {
           const token = localStorage.getItem('accessToken')
           if (token) {
@@ -168,6 +225,37 @@ export default function Dashboard() {
       setIsRefining(false)
     }
   }
+
+  // ── Simulate Live Event ──
+  const handleSimulateEvent = async (event) => {
+    const dest = meta?.destination || 'the destination'
+    const day = selectedDay
+    const prompt = event.prompt(dest, day)
+
+    // Show the alert banner immediately
+    setActiveAlert({ type: event.id, icon: event.icon, title: event.alert, prompt })
+    setDismissedAlert(false)
+    setSimulating(event.id)
+
+    // Call AI refine with the event-specific prompt
+    const planToRefine = refinedPlan || itinerary
+    try {
+      const res = await fetch(`${API_BASE}/itinerary/refine`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan: planToRefine, userRequest: prompt }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Simulation failed')
+      setRefinedPlan(data.refinedPlan)
+      if (data.refinedPlan?.aiNote) setAiNote(data.refinedPlan.aiNote)
+    } catch (err) {
+      console.error('[Simulate] error:', err.message)
+    } finally {
+      setSimulating(null)
+    }
+  }
+
 
   // ── Derived ──
   const plan = refinedPlan || itinerary
@@ -269,6 +357,65 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* ════════════════════════════════════
+          WEATHER STRIP
+      ════════════════════════════════════ */}
+      {weather && (
+        <div className="tcd-weather-strip">
+          <div className="tcd-weather-inner">
+            <img
+              className="tcd-weather-icon"
+              src={`https://openweathermap.org/img/wn/${weather.icon}.png`}
+              alt={weather.condition}
+            />
+            <span className="tcd-weather-temp">{weather.temp}°C</span>
+            <span className="tcd-weather-cond">{weather.condition}</span>
+            {weather.humidity && (
+              <span className="tcd-weather-meta">💧 {weather.humidity}%</span>
+            )}
+            {weather.windSpeed && (
+              <span className="tcd-weather-meta">💨 {weather.windSpeed} km/h</span>
+            )}
+            {weather.simulated && (
+              <span className="tcd-weather-sim-badge">Simulated</span>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ════════════════════════════════════
+          LIVE ALERT BANNER
+      ════════════════════════════════════ */}
+      <AnimatePresence>
+        {activeAlert && !dismissedAlert && (
+          <motion.div
+            className={`tcd-alert-banner tcd-alert-${activeAlert.type}`}
+            initial={{ opacity: 0, y: -12, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: 'auto' }}
+            exit={{ opacity: 0, y: -8, height: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="tcd-alert-inner">
+              <span className="tcd-alert-icon">{activeAlert.icon}</span>
+              <div className="tcd-alert-content">
+                <p className="tcd-alert-title">{activeAlert.title}</p>
+                <p className="tcd-alert-sub">
+                  {simulating
+                    ? '⚡ AI is adapting your itinerary in real-time…'
+                    : refinedPlan
+                      ? '✅ Itinerary has been updated. Scroll down to see changes.'
+                      : 'Tap a simulation button to auto-adapt your plan.'}
+                </p>
+              </div>
+              <button
+                className="tcd-alert-dismiss"
+                onClick={() => setDismissedAlert(true)}
+              >✕</button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ════════════════════════════════════
           MAIN TWO-COLUMN LAYOUT
@@ -476,6 +623,38 @@ export default function Dashboard() {
               <p className="tcd-ai-refined-badge">✓ AI refined version active</p>
             )}
           </motion.div>
+
+          {/* Live Events / Simulations */}
+          <motion.div
+            className="tcd-panel"
+            variants={fadeUp} initial="hidden" animate="show"
+            transition={{ delay: 0.12 }}
+          >
+            <p className="tcd-panel-title">📡 Live Events (Demo)</p>
+            <div className="tcd-events-list">
+              {LIVE_EVENTS.map(ev => (
+                <button
+                  key={ev.id}
+                  className="tcd-event-btn"
+                  onClick={() => handleSimulateEvent(ev)}
+                  disabled={simulating !== null}
+                  style={{ '--ev-color': ev.color }}
+                >
+                  <span className="tcd-ev-icon">{ev.icon}</span>
+                  <div className="tcd-ev-info">
+                    <span className="tcd-ev-label">{ev.label}</span>
+                    <span className="tcd-ev-sub">Simulate event</span>
+                  </div>
+                  {simulating === ev.id ? (
+                    <span className="tcd-spinner tcd-ev-spin" />
+                  ) : (
+                    <span className="tcd-ev-arrow">→</span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+
 
           {/* Trip Summary */}
           <motion.div

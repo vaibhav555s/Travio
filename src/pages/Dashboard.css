@@ -177,6 +177,232 @@
   white-space: nowrap;
 }
 
+/* ── WEATHER STRIP ──────────────────────────── */
+.tcd-weather-strip {
+  background: white;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+  position: relative;
+  z-index: 10;
+}
+
+.tcd-weather-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 12px 32px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.tcd-weather-icon {
+  width: 32px;
+  height: 32px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.tcd-weather-temp {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #1a1a1a;
+}
+
+.tcd-weather-cond {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #6b7280;
+  border-right: 1px solid #e5e7eb;
+  padding-right: 12px;
+}
+
+.tcd-weather-meta {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.tcd-weather-sim-badge {
+  margin-left: auto;
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #9ca3af;
+  background: #f3f4f6;
+  padding: 4px 8px;
+  border-radius: 100px;
+}
+
+/* ── LIVE ALERT BANNER ──────────────────────── */
+.tcd-alert-banner {
+  overflow: hidden;
+}
+
+.tcd-alert-inner {
+  max-width: 1136px;
+  margin: 16px auto 0;
+  padding: 16px 20px;
+  border-radius: 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  position: relative;
+}
+
+.tcd-alert-rain {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.05));
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.tcd-alert-rain .tcd-alert-title {
+  color: #1e40af;
+}
+
+.tcd-alert-weather {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.05));
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.tcd-alert-weather .tcd-alert-title {
+  color: #1e40af;
+}
+
+.tcd-alert-traffic {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(217, 119, 6, 0.05));
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.tcd-alert-traffic .tcd-alert-title {
+  color: #92400e;
+}
+
+.tcd-alert-flight {
+  background: linear-gradient(135deg, rgba(232, 99, 26, 0.1), rgba(220, 38, 38, 0.05));
+  border: 1px solid rgba(232, 99, 26, 0.2);
+}
+
+.tcd-alert-flight .tcd-alert-title {
+  color: #991b1b;
+}
+
+.tcd-alert-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+  padding-top: 2px;
+}
+
+.tcd-alert-content {
+  flex: 1;
+}
+
+.tcd-alert-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+
+.tcd-alert-sub {
+  font-size: 0.85rem;
+  color: #4b5563;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.tcd-alert-dismiss {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.tcd-alert-dismiss:hover {
+  color: #4b5563;
+}
+
+/* ── LIVE EVENTS PANEL ──────────────────────── */
+.tcd-events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tcd-event-btn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 16px;
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 14px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.tcd-event-btn:hover:not(:disabled) {
+  border-color: rgba(var(--ev-color), 0.3);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+  transform: translateY(-2px);
+}
+
+.tcd-event-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.tcd-ev-icon {
+  font-size: 1.4rem;
+  line-height: 1;
+  background: rgba(0, 0, 0, 0.03);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+}
+
+.tcd-ev-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tcd-ev-label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.tcd-ev-sub {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.tcd-ev-arrow {
+  font-size: 1.1rem;
+  color: #d1d5db;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.tcd-event-btn:hover:not(:disabled) .tcd-ev-arrow {
+  color: var(--ev-color, #E8631A);
+  transform: translateX(4px);
+}
+
+.tcd-ev-spin {
+  border-color: rgba(0, 0, 0, 0.2);
+  border-top-color: #1a1a1a;
+}
+
 /* ── BODY two-column ────────────────────────── */
 .tcd-body {
   max-width: 1200px;
