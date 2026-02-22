@@ -1,173 +1,277 @@
+/* ═══════════════════════════════════════════
+   DESTINATION CARDS — bento grid
+═══════════════════════════════════════════ */
+
 .destinations-section {
-  background: var(--color-off-white);
-  border-top: 1px solid var(--color-border);
-  padding: var(--spacing-5xl) var(--section-pad);
+  padding: 100px 0 80px;
+  background: #FAFAF7;
+  overflow: hidden;
 }
 
-.cards-scroll-container {
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-border) transparent;
-  margin-top: var(--spacing-3xl);
-  max-width: 1400px;
-  margin-left: auto;
-  margin-right: auto;
+/* ── Section header ───────────────────── */
+.destinations-header {
+  text-align: center;
+  margin-bottom: 36px;
 }
 
-.cards-scroll-container::-webkit-scrollbar {
-  height: 6px;
+.dest-eyebrow {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #E8631A;
+  margin: 0 0 12px;
 }
 
-.cards-scroll-container::-webkit-scrollbar-track {
-  background: transparent;
+.dest-title {
+  font-family: var(--font-display, 'Instrument Serif', Georgia, serif);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 400;
+  color: #1a1a1a;
+  margin: 0 0 10px;
+  line-height: 1.15;
 }
 
-.cards-scroll-container::-webkit-scrollbar-thumb {
-  background: var(--color-border);
-  border-radius: var(--radius-pill);
+.dest-subtitle {
+  font-size: 1rem;
+  color: #9ca3af;
+  margin: 0;
 }
 
-.cards-scroll-container::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-tertiary);
-}
-
-.cards-scroll {
+/* ── Filter pills ─────────────────────── */
+.dest-filters {
   display: flex;
-  gap: var(--spacing-xl);
-  padding-bottom: var(--spacing-lg);
-  min-width: min-content;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
 }
 
-.destination-card {
-  flex: 0 0 400px;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
+.dest-filter-pill {
+  position: relative;
+  padding: 9px 22px;
+  border-radius: 100px;
+  border: 1.5px solid #e5e7eb;
+  background: white;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.dest-filter-pill.active {
+  color: white;
+  border-color: transparent;
+}
+
+.dest-filter-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #F59E0B, #E8631A);
+  border-radius: 100px;
+  z-index: -1;
+}
+
+.dest-filter-pill:not(.active):hover {
+  border-color: #F59E0B;
+  color: #E8631A;
+}
+
+/* ── Bento grid ───────────────────────── */
+.dest-bento {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 320px;
+  gap: 18px;
+}
+
+/* Featured card spans 2 columns × 2 rows */
+.dest-card--featured {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+.dest-card {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #1a1a1a;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.3s;
   display: flex;
   flex-direction: column;
-  background: var(--color-white);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+}
+
+.dest-card:hover {
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.18);
+}
+
+/* ── Card image ───────────────────────── */
+.dest-card-img-wrap {
+  position: absolute;
+  inset: 0;
   overflow: hidden;
-  transition: all var(--transition-base) var(--ease-out);
 }
 
-.destination-card:hover {
-  border-color: var(--color-accent);
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-4px);
-}
-
-.card-image {
-  position: relative;
-  width: 100%;
-  height: 350px;
-  overflow: hidden;
-  background: var(--color-border);
-}
-
-.card-image img {
+.dest-card-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform var(--transition-base) var(--ease-out);
+  transform-origin: center;
+  display: block;
 }
 
-.destination-card:hover .card-image img {
-  transform: scale(1.08);
-}
-
-.card-overlay {
+.dest-card-gradient {
   position: absolute;
-  top: 0;
+  inset: 0;
+  background: linear-gradient(to top,
+      rgba(0, 0, 0, 0.85) 0%,
+      rgba(0, 0, 0, 0.35) 55%,
+      transparent 100%);
+}
+
+/* ── Tag pill ─────────────────────────── */
+.dest-tag {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  padding: 5px 14px;
+  border-radius: 100px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  backdrop-filter: blur(8px);
+}
+
+.dest-tag--coastal {
+  background: rgba(6, 182, 212, 0.22);
+  color: #67e8f9;
+  border: 1px solid rgba(6, 182, 212, 0.3);
+}
+
+.dest-tag--mountain {
+  background: rgba(99, 102, 241, 0.22);
+  color: #a5b4fc;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.dest-tag--desert {
+  background: rgba(245, 158, 11, 0.22);
+  color: #fde68a;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+/* ── Duration ─────────────────────────── */
+.dest-duration {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(8px);
+  color: white;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 100px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* ── Card body ────────────────────────── */
+.dest-card-body {
+  position: absolute;
+  bottom: 0;
   left: 0;
   right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity var(--transition-base) var(--ease-out);
-}
-
-.destination-card:hover .card-overlay {
-  opacity: 1;
-}
-
-.card-btn {
-  background: var(--color-accent);
-  color: white;
-  padding: var(--spacing-md) var(--spacing-xl);
-  border-radius: var(--radius-pill);
-  font-weight: 600;
-  font-size: var(--text-body-sm);
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  cursor: pointer;
-  transition: all var(--transition-fast) var(--ease-out);
-  border: none;
-}
-
-.card-btn:hover {
-  background: var(--color-accent-light);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
-}
-
-.card-content {
-  padding: var(--spacing-xl);
+  padding: 22px 22px 22px;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
-  flex: 1;
+  gap: 5px;
+  z-index: 2;
 }
 
-.card-location {
-  color: var(--color-accent);
+.dest-card-location {
+  font-size: 0.72rem;
   font-weight: 600;
-  font-size: var(--text-label);
+  color: rgba(255, 255, 255, 0.65);
+  margin: 0;
+  letter-spacing: 0.04em;
 }
 
-.card-content h3 {
-  color: var(--color-text-primary);
-  margin-bottom: var(--spacing-sm);
+.dest-card-name {
+  font-family: var(--font-display, 'Instrument Serif', Georgia, serif);
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: white;
+  margin: 0;
+  line-height: 1.2;
 }
 
-.card-content .text-body-sm {
-  color: var(--color-text-secondary);
-  line-height: var(--line-height-relaxed);
-  flex: 1;
+.dest-card--featured .dest-card-name {
+  font-size: 1.75rem;
 }
 
-.card-meta {
-  display: flex;
+.dest-card-desc {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.dest-card-btn {
+  display: inline-flex;
   align-items: center;
-  gap: var(--spacing-md);
-  margin-top: var(--spacing-sm);
-  padding-top: var(--spacing-md);
-  border-top: 1px solid var(--color-border);
+  gap: 6px;
+  margin-top: 10px;
+  padding: 9px 20px;
+  background: linear-gradient(135deg, #F59E0B, #E8631A);
+  color: white;
+  border-radius: 100px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: all 0.2s;
+  box-shadow: 0 4px 16px rgba(232, 99, 26, 0.4);
 }
 
-.card-meta span {
-  color: var(--color-text-tertiary);
-  font-size: var(--text-label);
+.dest-card-btn:hover {
+  box-shadow: 0 8px 24px rgba(232, 99, 26, 0.55);
+  transform: translateY(-1px);
 }
 
-@media (max-width: 768px) {
-  .destination-card {
-    flex: 0 0 350px;
+/* ── Responsive ───────────────────────── */
+@media (max-width: 900px) {
+  .dest-bento {
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: 260px;
   }
 
-  .card-image {
-    height: 300px;
+  .dest-card--featured {
+    grid-column: span 2;
+    grid-row: span 1;
+  }
+}
+
+@media (max-width: 580px) {
+  .dest-bento {
+    grid-template-columns: 1fr;
+    grid-auto-rows: 240px;
   }
 
-  .card-content {
-    padding: var(--spacing-lg);
+  .dest-card--featured {
+    grid-column: span 1;
+    grid-row: span 1;
   }
 }
