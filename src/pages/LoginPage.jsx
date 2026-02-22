@@ -34,7 +34,7 @@ const LoginPage = () => {
         localStorage.setItem('userEmail', data.user.email || '')
         setUser({ name: data.user.name || 'Traveler', email: data.user.email || '', id: data.user.id || '' })
       }
-      navigate('/home')
+      navigate('/')
     } catch (err) {
       setError(err.response?.data?.message || 'Invalid email or password')
     } finally {

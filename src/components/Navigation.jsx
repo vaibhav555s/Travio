@@ -81,10 +81,12 @@ const Navigation = () => {
         </div>
 
         <div className="nav-actions">
-          {/* Sign In always visible */}
-          <Link to="/login" className="nav-sign-in text-body-sm" style={{ textDecoration: 'none' }}>
-            Sign In
-          </Link>
+          {/* Sign In only visible when logged out */}
+          {!isLoggedIn && (
+            <Link to="/login" className="nav-sign-in text-body-sm" style={{ textDecoration: 'none' }}>
+              Sign In
+            </Link>
+          )}
           <Link to="/setup" className="nav-btn-primary text-body-sm">
             Plan Your Trip
           </Link>
@@ -111,9 +113,11 @@ const Navigation = () => {
           <Link to="/#explore" className="mobile-link text-body-sm" onClick={() => setIsMobileMenuOpen(false)}>Explore</Link>
           <Link to="/#how-it-works" className="mobile-link text-body-sm" onClick={() => setIsMobileMenuOpen(false)}>How It Works</Link>
           <Link to="/#about" className="mobile-link text-body-sm" onClick={() => setIsMobileMenuOpen(false)}>About</Link>
-          <Link to="/login" className="mobile-sign-in text-body-sm" style={{ textDecoration: 'none' }}>
-            Sign In
-          </Link>
+          {!isLoggedIn && (
+            <Link to="/login" className="mobile-sign-in text-body-sm" style={{ textDecoration: 'none' }} onClick={() => setIsMobileMenuOpen(false)}>
+              Sign In
+            </Link>
+          )}
           <Link to="/setup" className="mobile-btn-primary text-body-sm">
             Plan Your Trip
           </Link>
