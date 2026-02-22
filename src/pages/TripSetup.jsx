@@ -83,29 +83,22 @@ const TripSetup = () => {
 
   // ── Consistency: restore saved form state from sessionStorage ──
   const [formData, setFormData] = useState(() => {
-    const saved = sessionStorage.getItem('tripSetupData')
-    if (saved) {
-      const parsed = JSON.parse(saved)
-      return {
-        source: parsed.source || '',
-        destination: parsed.destination || '',
-        departureDate: parsed.departureDate || '',
-        returnDate: parsed.returnDate || '',
-        budget: parsed.budget || 30000,
-        travelers: parsed.travelers || 1,
-        vibes: parsed.vibes || [],
-        autoSubmit: parsed.autoSubmit || false,
-        autoSubmitCrew: parsed.autoSubmitCrew || false,
-      }
-    }
+    const savedString = sessionStorage.getItem('tripSetupData')
+    const saved = savedString ? JSON.parse(savedString) : {}
+
+    // Check if we arrived here from "Plan this route"
+    const prefilledDest = location.state?.destination || ''
+
     return {
-      source: '',
-      destination: '',
-      departureDate: '',
-      returnDate: '',
-      budget: 30000,
-      travelers: 1,
-      vibes: [],
+      source: saved.source || '',
+      destination: prefilledDest || saved.destination || '',
+      departureDate: saved.departureDate || '',
+      returnDate: saved.returnDate || '',
+      budget: saved.budget || 30000,
+      travelers: saved.travelers || 1,
+      vibes: saved.vibes || [],
+      autoSubmit: saved.autoSubmit || false,
+      autoSubmitCrew: saved.autoSubmitCrew || false,
     }
   })
 
