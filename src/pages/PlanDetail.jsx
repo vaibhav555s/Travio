@@ -7,7 +7,7 @@ import MetricBar from '../components/MetricBar'
 import CollaboratorModal from '../components/CollaboratorModal'
 import './PlanDetail.css'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5500'
+const API_BASE = '/api'
 
 const ACCENTS = {
   recommended: '#E8631A',
@@ -85,7 +85,7 @@ export default function PlanDetail() {
 
       try {
         const token = localStorage.getItem('accessToken')
-        const res = await fetch(`${API_URL}/api/itinerary/generate-itinerary`, {
+        const res = await fetch(`${API_BASE}/itinerary/generate-itinerary`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -138,12 +138,31 @@ export default function PlanDetail() {
   const handleSelectRoute = async () => {
     try {
       const token = localStorage.getItem('accessToken')
+      // Mark this plan as selected in DB
       if (originalPlan?.planId && token) {
-        await fetch(`${API_URL}/api/plans/${originalPlan.planId}/select`, {
+        await fetch(`${API_BASE}/plans/${originalPlan.planId}/select`, {
           method: 'PATCH',
           headers: { Authorization: `Bearer ${token}` }
         })
       }
+
+      // Store the full itinerary in sessionStorage so Dashboard can read real data
+      const activeItinerary = refinedPlan || itinerary || originalPlan
+      sessionStorage.setItem('selectedItinerary', JSON.stringify(activeItinerary))
+      sessionStorage.setItem('selectedPlanMeta', JSON.stringify({
+        planId: originalPlan?.planId || null,
+        tripId: tripData.tripId || null,
+        title: title,
+        accent: ACCENTS[planId] || '#E8631A',
+        photo: basePhoto,
+        destination: tripData.destination || '',
+        departureDate: tripData.departureDate || '',
+        returnDate: tripData.returnDate || '',
+        budget: tripData.budget || 0,
+        travelers: totalPeople,
+        totalCost: activeItinerary?.estimatedTotalBudget || activeItinerary?.totalCost || '',
+      }))
+
       navigate('/dashboard')
     } catch (err) {
       console.error('Failed to select plan:', err)
@@ -159,7 +178,7 @@ export default function PlanDetail() {
     const planToRefine = refinedPlan || itinerary || originalPlan
 
     try {
-      const res = await fetch(`${API_URL}/api/itinerary/refine`, {
+      const res = await fetch(`${API_BASE}/itinerary/refine`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ plan: planToRefine, userRequest: editPrompt }),
