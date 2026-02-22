@@ -37,6 +37,11 @@ const Navigation = () => {
   const currentStep = getStepIndex()
   const showNewNav = currentStep >= 0
 
+  // These pages have light backgrounds, so we force the "scrolled" (solid) navbar state for visibility
+  const isSolidPage = ['/trips', '/teams', '/home'].some(p =>
+    location.pathname === p || location.pathname.startsWith(p + '/')
+  )
+
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 100)
     window.addEventListener('scroll', handleScroll)
@@ -63,23 +68,25 @@ const Navigation = () => {
   }
 
   return (
-    <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
+    <nav className={`navbar ${(isScrolled || isSolidPage) ? 'scrolled' : ''}`}>
       <div className="nav-container">
         <Link to="/" className="nav-logo text-title">
           Radiator Routes
         </Link>
 
         <div className="nav-menu">
-          <Link to="/" className="nav-link text-body-sm">Explore</Link>
-          <Link to="/" className="nav-link text-body-sm">How It Works</Link>
-          <Link to="/" className="nav-link text-body-sm">About</Link>
+          <Link to="/#explore" className="nav-link text-body-sm">Explore</Link>
+          <Link to="/#how-it-works" className="nav-link text-body-sm">How It Works</Link>
+          <Link to="/#about" className="nav-link text-body-sm">About</Link>
         </div>
 
         <div className="nav-actions">
-          {/* Sign In always visible */}
-          <Link to="/login" className="nav-sign-in text-body-sm" style={{ textDecoration: 'none' }}>
-            Sign In
-          </Link>
+          {/* Sign In only visible when logged out */}
+          {!isLoggedIn && (
+            <Link to="/login" className="nav-sign-in text-body-sm" style={{ textDecoration: 'none' }}>
+              Sign In
+            </Link>
+          )}
           <Link to="/setup" className="nav-btn-primary text-body-sm">
             Plan Your Trip
           </Link>
@@ -103,12 +110,14 @@ const Navigation = () => {
           exit={{ opacity: 0, height: 0 }}
           transition={{ duration: 0.3 }}
         >
-          <Link to="/" className="mobile-link text-body-sm">Explore</Link>
-          <Link to="/" className="mobile-link text-body-sm">How It Works</Link>
-          <Link to="/" className="mobile-link text-body-sm">About</Link>
-          <Link to="/login" className="mobile-sign-in text-body-sm" style={{ textDecoration: 'none' }}>
-            Sign In
-          </Link>
+          <Link to="/#explore" className="mobile-link text-body-sm" onClick={() => setIsMobileMenuOpen(false)}>Explore</Link>
+          <Link to="/#how-it-works" className="mobile-link text-body-sm" onClick={() => setIsMobileMenuOpen(false)}>How It Works</Link>
+          <Link to="/#about" className="mobile-link text-body-sm" onClick={() => setIsMobileMenuOpen(false)}>About</Link>
+          {!isLoggedIn && (
+            <Link to="/login" className="mobile-sign-in text-body-sm" style={{ textDecoration: 'none' }} onClick={() => setIsMobileMenuOpen(false)}>
+              Sign In
+            </Link>
+          )}
           <Link to="/setup" className="mobile-btn-primary text-body-sm">
             Plan Your Trip
           </Link>

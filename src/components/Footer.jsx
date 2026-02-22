@@ -48,15 +48,15 @@ const NAV_COLS = [
   {
     heading: 'Explore',
     links: [
-      { label: 'Destinations', href: '#' },
-      { label: 'Scenic Routes', href: '#' },
-      { label: 'Travel Guides', href: '#' },
+      { label: 'Destinations', to: '/#explore' },
+      { label: 'Scenic Routes', to: '/#explore' },
+      { label: 'Travel Guides', to: '/#explore' },
     ],
   },
   {
     heading: 'Company',
     links: [
-      { label: 'About', href: '#' },
+      { label: 'About', to: '/#about' },
       { label: 'Blog', href: '#' },
       { label: 'Contact', href: '#' },
     ],
@@ -67,7 +67,7 @@ const Footer = () => {
   const year = new Date().getFullYear()
 
   return (
-    <footer className="footer p-12">
+    <footer className="footer">
 
       {/* Top accent bar */}
       <div className="footer-accent-bar" />

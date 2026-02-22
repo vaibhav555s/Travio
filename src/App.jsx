@@ -16,10 +16,12 @@ import Navigation from './components/Navigation'
 import SignupPage from './pages/SignupPage'
 import LoginPage from './pages/LoginPage'
 import VoiceInput from './components/VoiceInput'
+import ScrollToTop from './components/ScrollToTop'
 
 function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <AuthProvider>
         <Navigation />
         <AnimatePresence mode="wait">
