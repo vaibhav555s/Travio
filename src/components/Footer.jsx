@@ -1,133 +1,132 @@
 import { Link } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import './Footer.css'
 
-const SocialIcon = ({ name, url }) => {
-  const iconMap = {
-    instagram: 'instagram.com',
-    twitter: 'twitter.com',
-    facebook: 'facebook.com',
-    linkedin: 'linkedin.com',
-  }
+const SOCIAL = [
+  {
+    label: 'Instagram',
+    href: 'https://instagram.com',
+    icon: (
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+      </svg>
+    ),
+  },
+  {
+    label: 'Twitter',
+    href: 'https://twitter.com',
+    icon: (
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+      </svg>
+    ),
+  },
+  {
+    label: 'LinkedIn',
+    href: 'https://linkedin.com',
+    icon: (
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+        <rect x="2" y="9" width="4" height="12" />
+        <circle cx="4" cy="4" r="2" />
+      </svg>
+    ),
+  },
+]
 
-  return (
-    <a
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="social-icon"
-      aria-label={name}
-      title={name}
-    >
-      <span>{name[0].toUpperCase()}</span>
-    </a>
-  )
-}
+const NAV_COLS = [
+  {
+    heading: 'Product',
+    links: [
+      { label: 'Plan a Trip', to: '/setup' },
+      { label: 'My Trips', to: '/trips' },
+      { label: 'Dashboard', to: '/home' },
+    ],
+  },
+  {
+    heading: 'Explore',
+    links: [
+      { label: 'Destinations', href: '#' },
+      { label: 'Scenic Routes', href: '#' },
+      { label: 'Travel Guides', href: '#' },
+    ],
+  },
+  {
+    heading: 'Company',
+    links: [
+      { label: 'About', href: '#' },
+      { label: 'Blog', href: '#' },
+      { label: 'Contact', href: '#' },
+    ],
+  },
+]
 
 const Footer = () => {
-  const currentYear = new Date().getFullYear()
+  const year = new Date().getFullYear()
 
   return (
-    <footer className="footer">
-      <div className="container footer-content">
-        <div className="footer-section">
-          <Link to="/" className="footer-logo text-display">
-            Radiator
-          </Link>
-          <p className="text-body-sm">
-            AI-powered road trip planning for the scenic route lover.
+    <footer className="footer p-12">
+
+      {/* Top accent bar */}
+      <div className="footer-accent-bar" />
+
+      <div className="container footer-body">
+
+        {/* Brand column */}
+        <div className="footer-brand">
+          <Link to="/" className="footer-logo">Radiator Routes</Link>
+          <p className="footer-tagline">
+            AI-powered travel planning for explorers who live for the scenic route.
           </p>
-          <div className="social-links">
-            <SocialIcon name="Instagram" url="https://instagram.com" />
-            <SocialIcon name="Twitter" url="https://twitter.com" />
-            <SocialIcon name="Facebook" url="https://facebook.com" />
-            <SocialIcon name="LinkedIn" url="https://linkedin.com" />
+
+          {/* Social icons */}
+          <div className="footer-socials">
+            {SOCIAL.map(s => (
+              <motion.a
+                key={s.label}
+                href={s.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="footer-social-btn"
+                aria-label={s.label}
+                whileHover={{ y: -3 }}
+                transition={{ duration: 0.18 }}
+              >
+                {s.icon}
+              </motion.a>
+            ))}
           </div>
         </div>
 
-        <div className="footer-section">
-          <h4 className="text-label footer-title">Product</h4>
-          <ul className="footer-links">
-            <li>
-              <a href="#features" className="text-body-sm">
-                Features
-              </a>
-            </li>
-            <li>
-              <a href="#pricing" className="text-body-sm">
-                Pricing
-              </a>
-            </li>
-            <li>
-              <a href="#security" className="text-body-sm">
-                Security
-              </a>
-            </li>
-            <li>
-              <a href="#roadmap" className="text-body-sm">
-                Roadmap
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        <div className="footer-section">
-          <h4 className="text-label footer-title">Resources</h4>
-          <ul className="footer-links">
-            <li>
-              <a href="#blog" className="text-body-sm">
-                Blog
-              </a>
-            </li>
-            <li>
-              <a href="#docs" className="text-body-sm">
-                Documentation
-              </a>
-            </li>
-            <li>
-              <a href="#api" className="text-body-sm">
-                API Reference
-              </a>
-            </li>
-            <li>
-              <a href="#community" className="text-body-sm">
-                Community
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        <div className="footer-section">
-          <h4 className="text-label footer-title">Legal</h4>
-          <ul className="footer-links">
-            <li>
-              <a href="#privacy" className="text-body-sm">
-                Privacy Policy
-              </a>
-            </li>
-            <li>
-              <a href="#terms" className="text-body-sm">
-                Terms of Service
-              </a>
-            </li>
-            <li>
-              <a href="#cookies" className="text-body-sm">
-                Cookie Policy
-              </a>
-            </li>
-            <li>
-              <a href="#contact" className="text-body-sm">
-                Contact
-              </a>
-            </li>
-          </ul>
-        </div>
+        {/* Nav columns */}
+        {NAV_COLS.map(col => (
+          <div key={col.heading} className="footer-col">
+            <p className="footer-col-heading">{col.heading}</p>
+            <ul className="footer-col-links">
+              {col.links.map(l => (
+                <li key={l.label}>
+                  {l.to
+                    ? <Link to={l.to} className="footer-link">{l.label}</Link>
+                    : <a href={l.href} className="footer-link">{l.label}</a>
+                  }
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
       </div>
 
+      {/* Bottom bar */}
       <div className="footer-bottom">
-        <div className="container footer-bottom-content">
-          <p className="text-caption">
-            © {currentYear} Radiator Routes. All rights reserved.
-          </p>
+        <div className="container footer-bottom-inner">
+          <p className="footer-copy">© {year} Radiator Routes. Built with ❤️ for wanderers.</p>
+          <div className="footer-legal">
+            <a href="#" className="footer-link-sm">Privacy</a>
+            <a href="#" className="footer-link-sm">Terms</a>
+            <a href="#" className="footer-link-sm">Cookies</a>
+          </div>
         </div>
       </div>
     </footer>

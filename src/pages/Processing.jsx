@@ -11,7 +11,9 @@ const messages = [
   'Building 3 distinct routes...',
 ]
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5500'
+// Use relative /api path so Vite proxy forwards the request WITH auth headers
+// (calling localhost:5500 directly would bypass proxy and CORS would strip the Authorization header)
+const API_BASE = '/api'
 
 const Processing = () => {
   const navigate = useNavigate()
@@ -65,7 +67,7 @@ const Processing = () => {
         const tripData = saved ? JSON.parse(saved) : {}
         const token = localStorage.getItem('accessToken')
 
-        const response = await fetch(`${API_URL}/api/itinerary/generate-options`, {
+        const response = await fetch(`${API_BASE}/itinerary/generate-options`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
