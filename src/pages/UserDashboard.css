@@ -1,18 +1,16 @@
-/* ═══════════════════════════════════════════════════
-   USER DASHBOARD — premium travel aesthetic
-═══════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════
+   USER DASHBOARD
+═══════════════════════════════════════════════ */
 
-/* ── Page wrapper ─────────────────────── */
 .ud-page {
     min-height: 100vh;
     background: #F7F5F0;
 }
 
-/* ── Main container (below hero) ──────── */
 .ud-container {
-    max-width: 1140px;
+    max-width: 1100px;
     margin: 0 auto;
-    padding: 0 24px 80px;
+    padding: 48px 24px 80px;
     display: flex;
     flex-direction: column;
     gap: 48px;
@@ -24,9 +22,8 @@
 .ud-hero {
     position: relative;
     background: #0f0f0f;
-    padding: 80px 0 72px;
+    padding: 80px 0 56px;
     overflow: hidden;
-    margin-bottom: 0;
 }
 
 .ud-hero-orb {
@@ -37,25 +34,25 @@
 }
 
 .ud-hero-orb--a {
-    width: 480px;
-    height: 480px;
-    background: radial-gradient(circle, rgba(232, 99, 26, 0.30) 0%, transparent 70%);
-    bottom: -120px;
-    left: -80px;
+    width: 420px;
+    height: 420px;
+    background: radial-gradient(circle, rgba(232, 99, 26, 0.28) 0%, transparent 70%);
+    bottom: -100px;
+    left: -60px;
 }
 
 .ud-hero-orb--b {
-    width: 400px;
-    height: 400px;
+    width: 360px;
+    height: 360px;
     background: radial-gradient(circle, rgba(245, 158, 11, 0.18) 0%, transparent 70%);
-    top: -60px;
-    right: -60px;
+    top: -50px;
+    right: -40px;
 }
 
 .ud-hero-inner {
     position: relative;
     z-index: 2;
-    max-width: 1140px;
+    max-width: 1100px;
     margin: 0 auto;
     padding: 0 24px;
     display: flex;
@@ -82,7 +79,7 @@
 
 .ud-hero-greeting {
     font-family: var(--font-display, 'Instrument Serif', Georgia, serif);
-    font-size: clamp(2rem, 4vw, 3rem);
+    font-size: clamp(1.9rem, 4vw, 2.9rem);
     font-weight: 400;
     color: white;
     margin: 0;
@@ -91,21 +88,19 @@
 
 .ud-hero-sub {
     font-size: 1rem;
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(255, 255, 255, 0.55);
     margin: 0;
 }
 
 .ud-hero-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
     padding: 14px 28px;
     background: linear-gradient(135deg, #F59E0B, #E8631A);
     color: white;
+    border: none;
     border-radius: 100px;
     font-weight: 700;
     font-size: 0.92rem;
-    text-decoration: none;
+    cursor: pointer;
     white-space: nowrap;
     box-shadow: 0 6px 24px rgba(232, 99, 26, 0.45);
     transition: all 0.22s ease;
@@ -123,8 +118,6 @@
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 16px;
-    margin-top: -28px;
-    /* pull up into hero */
 }
 
 .ud-stat-card {
@@ -137,12 +130,11 @@
     gap: 6px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
     border: 1px solid rgba(0, 0, 0, 0.05);
-    cursor: default;
     transition: box-shadow 0.2s, border-color 0.2s;
 }
 
 .ud-stat-card:hover {
-    box-shadow: 0 10px 36px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 10px 36px rgba(0, 0, 0, 0.1);
     border-color: rgba(245, 158, 11, 0.2);
 }
 
@@ -160,7 +152,7 @@
 }
 
 .ud-stat-label {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.12em;
@@ -168,88 +160,90 @@
 }
 
 /* ═══════════════════════════════════════
-   UPCOMING TRIP BANNER
+   UPCOMING TRIP CARD
 ═══════════════════════════════════════ */
-.ud-upcoming {
-    position: relative;
-    border-radius: 24px;
-    overflow: hidden;
-    height: 220px;
-    cursor: pointer;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+.ud-upcoming-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    background: white;
+    border-radius: 20px;
+    padding: 28px 32px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+    border: 1px solid rgba(245, 158, 11, 0.15);
+    flex-wrap: wrap;
 }
 
-.ud-upcoming-img-wrap {
-    position: absolute;
-    inset: 0;
-}
-
-.ud-upcoming-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.ud-upcoming-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to right, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.35) 60%, transparent 100%);
-}
-
-.ud-upcoming-content {
-    position: absolute;
-    inset: 0;
+.ud-upcoming-left {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    padding: 32px 36px;
     gap: 8px;
-    z-index: 2;
 }
 
-.ud-upcoming-badge {
+.ud-status-badge {
     font-size: 0.65rem;
     font-weight: 800;
     letter-spacing: 0.2em;
-    color: #86efac;
+    color: #16a34a;
     text-transform: uppercase;
 }
 
 .ud-upcoming-dest {
     font-family: var(--font-display, 'Instrument Serif', Georgia, serif);
-    font-size: 1.8rem;
+    font-size: 1.6rem;
     font-weight: 400;
-    color: white;
+    color: #1a1a1a;
     margin: 0;
-    line-height: 1.15;
 }
 
 .ud-upcoming-meta {
     display: flex;
     gap: 16px;
     flex-wrap: wrap;
-    font-size: 0.82rem;
-    color: rgba(255, 255, 255, 0.7);
 }
 
-.ud-upcoming-btn {
-    margin-top: 8px;
-    padding: 10px 22px;
+.ud-meta-item {
+    font-size: 0.82rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.ud-upcoming-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.ud-view-btn {
+    padding: 11px 24px;
     background: linear-gradient(135deg, #F59E0B, #E8631A);
     color: white;
     border: none;
     border-radius: 100px;
-    font-size: 0.85rem;
+    font-size: 0.88rem;
     font-weight: 700;
     cursor: pointer;
-    align-self: flex-start;
-    transition: all 0.2s;
     box-shadow: 0 4px 16px rgba(232, 99, 26, 0.4);
+    transition: all 0.2s;
 }
 
-.ud-upcoming-btn:hover {
+.ud-view-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(232, 99, 26, 0.55);
+    box-shadow: 0 8px 24px rgba(232, 99, 26, 0.5);
+}
+
+/* ═══════════════════════════════════════
+   SECTION TITLE
+═══════════════════════════════════════ */
+.ud-section-title {
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #9ca3af;
+    margin: 0 0 16px;
 }
 
 /* ═══════════════════════════════════════
@@ -302,106 +296,46 @@
 }
 
 .ud-tab-panel {
-    min-height: 240px;
+    min-height: 180px;
 }
 
 /* ═══════════════════════════════════════
-   TRIP IMAGE CARDS GRID
+   TRIP CARD SCROLL ROW
 ═══════════════════════════════════════ */
-.ud-cards-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-}
-
-.ud-trip-card {
-    border-radius: 18px;
-    overflow: hidden;
-    background: white;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
-    cursor: pointer;
-    transition: box-shadow 0.25s;
-    border: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.ud-trip-img-wrap {
-    position: relative;
-    height: 160px;
-    overflow: hidden;
-}
-
-.ud-trip-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s ease;
-}
-
-.ud-trip-card:hover .ud-trip-img {
-    transform: scale(1.06);
-}
-
-.ud-trip-gradient {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.55) 0%, transparent 60%);
-}
-
-.ud-trip-badge {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    font-size: 0.65rem;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    padding: 4px 10px;
-    border-radius: 100px;
-    backdrop-filter: blur(8px);
-}
-
-.ud-trip-badge.owner {
-    background: rgba(245, 158, 11, 0.22);
-    color: #fde68a;
-    border: 1px solid rgba(245, 158, 11, 0.3);
-}
-
-.ud-trip-badge.collaborator {
-    background: rgba(99, 102, 241, 0.22);
-    color: #c7d2fe;
-    border: 1px solid rgba(99, 102, 241, 0.3);
-}
-
-.ud-trip-body {
-    padding: 14px 16px 18px;
+.ud-scroll-row {
     display: flex;
-    flex-direction: column;
-    gap: 4px;
+    gap: 20px;
+    flex-wrap: wrap;
 }
 
-.ud-trip-location {
-    font-size: 0.88rem;
-    font-weight: 700;
-    color: #1a1a1a;
-    margin: 0;
-}
-
-.ud-trip-dates {
-    font-size: 0.76rem;
-    color: #9ca3af;
-    margin: 0;
-}
-
-.ud-trip-budget {
-    font-size: 0.78rem;
-    font-weight: 700;
-    color: #E8631A;
-    margin: 0;
+/* ═══════════════════════════════════════
+   TEAMS GRID
+═══════════════════════════════════════ */
+.ud-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
 }
 
 /* ═══════════════════════════════════════
    INVITE CARDS
 ═══════════════════════════════════════ */
+.ud-invites-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.ud-invite-badge {
+    background: #E8631A;
+    color: white;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 100px;
+}
+
 .ud-invites-list {
     display: flex;
     flex-direction: column;
@@ -411,49 +345,32 @@
 .ud-invite-card {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 16px;
     background: white;
     border-radius: 16px;
-    padding: 14px 16px;
+    padding: 16px 20px;
     box-shadow: 0 3px 14px rgba(0, 0, 0, 0.07);
     border: 1px solid rgba(0, 0, 0, 0.05);
-    transition: box-shadow 0.2s;
+    flex-wrap: wrap;
 }
 
-.ud-invite-card:hover {
-    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1);
-}
-
-.ud-invite-thumb {
-    width: 60px;
-    height: 60px;
-    border-radius: 12px;
-    overflow: hidden;
-    flex-shrink: 0;
-}
-
-.ud-invite-thumb img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.ud-invite-info {
-    flex: 1;
-    min-width: 0;
+.ud-invite-left {
     display: flex;
-    flex-direction: column;
-    gap: 3px;
+    align-items: center;
+    gap: 14px;
+}
+
+.ud-invite-icon {
+    font-size: 1.5rem;
+    line-height: 1;
 }
 
 .ud-invite-dest {
-    font-size: 0.92rem;
+    font-size: 0.95rem;
     font-weight: 700;
     color: #1a1a1a;
-    margin: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    margin: 0 0 3px;
 }
 
 .ud-invite-dates {
@@ -465,7 +382,6 @@
 .ud-invite-actions {
     display: flex;
     gap: 8px;
-    flex-shrink: 0;
 }
 
 .ud-invite-btn {
@@ -509,60 +425,41 @@
 }
 
 /* ═══════════════════════════════════════
-   EMPTY STATES + LOADING SKELETONS
+   EMPTY + LOADING
 ═══════════════════════════════════════ */
-.ud-empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 64px 24px;
+.ud-empty {
+    padding: 36px 20px;
+    color: #9ca3af;
+    font-size: 0.9rem;
+    background: white;
+    border-radius: 16px;
+    border: 1px dashed rgba(0, 0, 0, 0.1);
     text-align: center;
 }
 
-.ud-empty-icon {
-    font-size: 2.5rem;
-    line-height: 1;
-}
-
-.ud-empty-state p {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #6b7280;
-    margin: 0;
-}
-
-.ud-empty-hint {
-    font-size: 0.85rem !important;
-    font-weight: 400 !important;
-    color: #c4b5aa !important;
-}
-
-.ud-empty-cta {
+.ud-empty-link {
     background: none;
     border: none;
     color: #E8631A;
     font-weight: 700;
-    font-size: 0.9rem;
     cursor: pointer;
+    font-size: inherit;
     padding: 0;
-    margin-top: 4px;
 }
 
-.ud-empty-cta:hover {
+.ud-empty-link:hover {
     text-decoration: underline;
 }
 
-.ud-loading-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+.ud-loading-row {
+    display: flex;
     gap: 20px;
 }
 
 .ud-skeleton {
-    height: 240px;
-    border-radius: 18px;
+    flex: 0 0 260px;
+    height: 180px;
+    border-radius: 16px;
     background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
     background-size: 200% 100%;
     animation: shimmer 1.4s ease-in-out infinite;
@@ -578,7 +475,6 @@
     }
 }
 
-/* ── Spinner ──────────────────────────── */
 .ud-spinner {
     display: inline-block;
     width: 14px;
@@ -602,10 +498,6 @@
     .ud-stats-row {
         grid-template-columns: repeat(2, 1fr);
     }
-
-    .ud-cards-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
 }
 
 @media (max-width: 580px) {
@@ -616,18 +508,13 @@
 
     .ud-stats-row {
         grid-template-columns: repeat(2, 1fr);
-        margin-top: -20px;
     }
 
-    .ud-cards-grid {
-        grid-template-columns: 1fr;
+    .ud-upcoming-card {
+        flex-direction: column;
     }
 
-    .ud-upcoming {
-        height: 280px;
-    }
-
-    .ud-invite-card {
-        flex-wrap: wrap;
+    .ud-upcoming-right {
+        align-items: flex-start;
     }
 }
