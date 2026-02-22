@@ -70,35 +70,6 @@
   opacity: 0.6;
 }
 
-/* ── Floating map pins ────────────────── */
-.hero-pin {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  background: rgba(20, 10, 0, 0.52);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(245, 158, 11, 0.28);
-  border-radius: 100px;
-  padding: 8px 16px 8px 10px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.92);
-  letter-spacing: 0.03em;
-  z-index: 8;
-  cursor: default;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(245, 158, 11, 0.15) inset;
-  white-space: nowrap;
-  transform: translateX(-50%);
-}
-
-.hero-pin-emoji {
-  font-size: 1rem;
-  line-height: 1;
-  flex-shrink: 0;
-}
-
 /* ── Hero content ─────────────────────── */
 .hero-content {
   position: relative;
@@ -155,10 +126,7 @@
 
 .hero-rotating-word {
   display: inline-block;
-  background: linear-gradient(135deg, #FDE68A 0%, #F59E0B 40%, #FDBA74 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #FFE8B0;
   filter: drop-shadow(0 0 40px rgba(245, 158, 11, 0.5));
   position: relative;
 }

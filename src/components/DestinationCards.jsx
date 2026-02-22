@@ -5,59 +5,59 @@ import './DestinationCards.css'
 
 const DESTINATIONS = [
   {
-    name: 'Pacific Coast Highway',
-    location: 'California, USA',
-    description: 'Iconic cliff-side drives with sweeping ocean views and sea-breeze villages.',
-    days: '5 days',
-    tag: 'Coastal',
-    category: 'coastal',
-    featured: true,
-    image: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=900&h=700&fit=crop',
-  },
-  {
-    name: 'Blue Ridge Parkway',
-    location: 'North Carolina, USA',
-    description: 'Panoramic mountain ridgelines with autumn foliage.',
-    days: '7 days',
-    tag: 'Mountain',
-    category: 'mountain',
-    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&h=400&fit=crop',
-  },
-  {
     name: 'Manali – Leh Highway',
     location: 'Himachal Pradesh, India',
-    description: 'High-altitude passes, prayer flags, and breathtaking moonscapes.',
+    description: 'The ultimate bucket-list drive through high-altitude passes and moon-like landscapes.',
     days: '8 days',
     tag: 'Mountain',
     category: 'mountain',
-    image: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=500&h=400&fit=crop',
+    featured: true,
+    image: 'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=900&h=700&fit=crop',
   },
   {
-    name: 'Route 66 Adventure',
-    location: 'Illinois to California',
-    description: 'The Mother Road — retro diners, ghost towns, and open skies.',
-    days: '10 days',
+    name: 'The Golden Triangle',
+    location: 'Delhi – Agra – Jaipur',
+    description: 'Explore the heart of India’s history, from the Taj Mahal to the Pink City.',
+    days: '6 days',
     tag: 'Desert',
     category: 'desert',
-    image: 'https://images.unsplash.com/photo-1464207687429-7505649dae38?w=500&h=400&fit=crop',
+    image: '/golden-triangle-tour-banner.jpg',
   },
   {
-    name: 'Milford Sound',
-    location: 'New Zealand',
-    description: 'Fjords, waterfalls, and dramatic South Island landscapes.',
-    days: '6 days',
+    name: 'Konkan Coastal Drive',
+    location: 'Mumbai – Goa',
+    description: 'Breathtaking ocean views, hidden forts, and the freshest seafood along the coast.',
+    days: '5 days',
     tag: 'Coastal',
     category: 'coastal',
-    image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=500&h=400&fit=crop',
+    image: 'https://images.unsplash.com/photo-1512341689857-198e7e2f3ca8?w=500&h=400&fit=crop',
   },
   {
-    name: 'Great Ocean Road',
-    location: 'Victoria, Australia',
-    description: 'Coastal wonders, limestone apostles, and wild surf breaks.',
+    name: 'The Desert Circuit',
+    location: 'Jodhpur – Jaisalmer',
+    description: 'Drive through the golden sands of the Thar Desert and sleep under the stars.',
     days: '4 days',
+    tag: 'Desert',
+    category: 'desert',
+    image: '/Jodhpur – Jaisalmer.webp',
+  },
+  {
+    name: 'Munnar Tea Trails',
+    location: 'Idukki, Kerala',
+    description: 'Winding roads through lush tea estates, misty valleys, and cascading waterfalls.',
+    days: '4 days',
+    tag: 'Mountain',
+    category: 'mountain',
+    image: 'https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=500&h=400&fit=crop',
+  },
+  {
+    name: 'East Coast Road',
+    location: 'Chennai – Pondicherry',
+    description: 'A beautiful seaside cruise along the ECR to the colonial French town.',
+    days: '3 days',
     tag: 'Coastal',
     category: 'coastal',
-    image: 'https://images.unsplash.com/photo-1527631746610-bca00a040d60?w=500&h=400&fit=crop',
+    image: '/Chennai – Pondicherry.jpg',
   },
 ]
 
@@ -151,7 +151,7 @@ const DestinationCards = () => {
                   <h3 className="dest-card-name">{dest.name}</h3>
                   <p className="dest-card-desc">{dest.description}</p>
 
-                  <Link to="/setup" className="dest-card-btn">
+                  <Link to="/setup" state={{ destination: dest.name }} className="dest-card-btn">
                     Plan this route
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                       <path d="m9 18 6-6-6-6" />

@@ -8,12 +8,6 @@ import './HeroSection.css'
 // Rotating words for the typewriter effect
 const ROTATING_WORDS = ['Scenic Route', 'Himalayan Pass', 'Coastal Highway', 'Perfect Journey', 'Hidden Gem']
 
-// 3 tasteful floating destination pins — positioned below hero text
-const MAP_PINS = [
-  { label: 'Goa', emoji: '🌊', top: '76%', left: '18%', delay: 0 },
-  { label: 'Manali', emoji: '🏔️', top: '76%', left: '48%', delay: 0.25 },
-  { label: 'Ladakh', emoji: '🌄', top: '76%', left: '76%', delay: 0.5 },
-]
 
 const HeroSection = () => {
   const [wordIdx, setWordIdx] = useState(0)
@@ -46,25 +40,6 @@ const HeroSection = () => {
         {/* ── Ambient gradient orbs ── */}
         <div className="hero-orb hero-orb--amber" />
         <div className="hero-orb hero-orb--blue" />
-        <div className="hero-noise" />
-
-        {/* ── Floating destination pills ── */}
-        {MAP_PINS.map((pin) => (
-          <motion.div
-            key={pin.label}
-            className="hero-pin"
-            style={{ top: pin.top, left: pin.left }}
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: [0, -6, 0] }}
-            transition={{
-              opacity: { delay: pin.delay + 1.5, duration: 0.6 },
-              y: { delay: pin.delay + 2.1, duration: 4, repeat: Infinity, ease: 'easeInOut' },
-            }}
-          >
-            <span className="hero-pin-emoji">{pin.emoji}</span>
-            <span>{pin.label}</span>
-          </motion.div>
-        ))}
 
         {/* ── Main hero content ── */}
         <div className="hero-content container">
