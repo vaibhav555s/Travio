@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { TextInput, DateInput } from '../components/FormField'
@@ -111,37 +111,43 @@ const TripSetup = () => {
 
   // ── Consistency: persist to sessionStorage on every change ──
   useEffect(() => {
-    // Preserve autoSubmit flags if they exist in state but not yet saved
     sessionStorage.setItem('tripSetupData', JSON.stringify(formData))
     window.dispatchEvent(new Event('tripDataUpdated'))
+  }, [formData])
 
-    // ── Voice Auto-Submit ──
-    if (formData.autoSubmit) {
-      console.log('[TripSetup] 🚀 Auto-submit detected in state. Checking validation...')
+  // ── Voice Auto-Submit (Mount Trigger) ──
+  const autoSubmitPerformed = useRef(false)
+  useEffect(() => {
+    const saved = JSON.parse(sessionStorage.getItem('tripSetupData') || '{}')
+    if (saved.autoSubmit && !autoSubmitPerformed.current) {
+      console.log('[TripSetup] 🚀 Auto-submit triggered on mount. Validating...')
+      autoSubmitPerformed.current = true
 
-      const newErrors = {}
-      if (!formData.source) newErrors.source = 'Missing source'
-      if (!formData.destination) newErrors.destination = 'Missing destination'
-      if (!formData.departureDate) newErrors.departureDate = 'Missing departure date'
-      if (!formData.returnDate) newErrors.returnDate = 'Missing return date'
-      if (formData.vibes.length === 0) newErrors.vibes = 'Missing vibes'
+      // Validation check
+      const vErrors = {}
+      if (!saved.source) vErrors.source = 'Missing source'
+      if (!saved.destination) vErrors.destination = 'Missing destination'
+      if (!saved.departureDate) vErrors.departureDate = 'Missing departure'
+      if (!saved.returnDate) vErrors.returnDate = 'Missing return'
+      if (!saved.vibes?.length) vErrors.vibes = 'Missing vibes'
 
-      if (Object.keys(newErrors).length === 0) {
-        console.log('[TripSetup] ✅ Validation passed. Navigating to crew in 500ms...')
+      if (Object.keys(vErrors).length === 0) {
+        console.log('[TripSetup] ✅ Validation passed. Transitioning to /crew...')
 
-        // Remove flag from state to prevent loops
+        // 1. Clear flags in state and storage
         setFormData(prev => ({ ...prev, autoSubmit: false }))
+        sessionStorage.setItem('tripSetupData', JSON.stringify({ ...saved, autoSubmit: false }))
 
-        const timer = setTimeout(() => {
-          handleSubmit() // Call directly
-        }, 500)
-        return () => clearTimeout(timer)
+        // 2. Fire-and-forget navigation after a delay
+        setTimeout(() => {
+          handleSubmit()
+        }, 800)
       } else {
-        console.warn('[TripSetup] ❌ Auto-submit blocked by validation errors:', newErrors)
+        console.warn('[TripSetup] ❌ Auto-submit blocked by validation:', vErrors)
         setFormData(prev => ({ ...prev, autoSubmit: false }))
       }
     }
-  }, [formData])
+  }, []) // Mount only
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }))

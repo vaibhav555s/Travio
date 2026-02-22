@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
 import TravelerCard from '../components/TravelerCard'
@@ -49,20 +49,25 @@ const Crew = () => {
         sessionStorage.setItem('tripSetupData', JSON.stringify({ ...parsed, travelers: travelers.length }))
         window.dispatchEvent(new Event('tripDataUpdated'))
       }
-
-      // ── Voice Auto-Submit (Jump to Processing) ──
-      if (parsed.autoSubmitCrew) {
-        console.log('[Crew] 🚀 Auto-submitting crew for voice trip...')
-        // Remove flag to prevent loop
-        sessionStorage.setItem('tripSetupData', JSON.stringify({ ...parsed, autoSubmitCrew: false }))
-
-        const timer = setTimeout(() => {
-          handleSubmit() // Call directly
-        }, 500)
-        return () => clearTimeout(timer)
-      }
     }
   }, [travelers])
+
+  // ── Voice Auto-Submit (Mount Trigger) ──
+  const autoSubmitPerformed = useRef(false)
+  useEffect(() => {
+    const saved = JSON.parse(sessionStorage.getItem('tripSetupData') || '{}')
+    if (saved.autoSubmitCrew && !autoSubmitPerformed.current) {
+      console.log('[Crew] 🚀 Auto-submitting crew section on mount...')
+      autoSubmitPerformed.current = true
+
+      // Clear flag immediately
+      sessionStorage.setItem('tripSetupData', JSON.stringify({ ...saved, autoSubmitCrew: false }))
+
+      setTimeout(() => {
+        handleSubmit()
+      }, 800)
+    }
+  }, []) // Mount only
 
   const handleAddTraveler = () => {
     if (travelers.length < 12) {

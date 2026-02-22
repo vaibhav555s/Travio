@@ -35,6 +35,7 @@ const VoiceInput = () => {
     const [showTip, setShowTip] = useState(false)
     const [mediaRecorder, setMediaRecorder] = useState(null)
     const [audioChunks, setAudioChunks] = useState([])
+    const [isExtracting, setIsExtracting] = useState(false)
     const inputRef = useRef(null)
     const tipTimer = useRef(null)
 
@@ -96,11 +97,12 @@ const VoiceInput = () => {
     }, [isListening, audioChunks.length, mediaRecorder])
 
     const performExtractionAndRedirect = async (userInput) => {
-        if (location.pathname !== '/') return
+        if (location.pathname !== '/' || isExtracting) return
 
         console.log("📍 Landing Page detected, extracting parameters for:", userInput)
+        setIsExtracting(true)
         try {
-            const extractResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/itinerary/voice-to-setup`, {
+            const extractResponse = await fetch(`/api/itinerary/voice-to-setup`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ prompt: userInput }),
@@ -109,6 +111,7 @@ const VoiceInput = () => {
 
             if (extractData.error === "DESTINATION_REQUIRED") {
                 alert("Please specify a destination in your request.")
+                setIsExtracting(false)
                 return
             }
 
@@ -139,6 +142,8 @@ const VoiceInput = () => {
             }
         } catch (err) {
             console.error("❌ Extraction error:", err)
+        } finally {
+            setIsExtracting(false)
         }
     }
 
@@ -148,7 +153,7 @@ const VoiceInput = () => {
             const formData = new FormData()
             formData.append("audio", blob)
 
-            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/speech-to-text`, {
+            const response = await fetch(`/api/speech-to-text`, {
                 method: "POST",
                 body: formData,
             })
