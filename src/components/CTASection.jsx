@@ -5,7 +5,7 @@ import './CTASection.css'
 
 const CTASection = () => {
   return (
-    <section className="cta-section">
+    <section id="about" className="cta-section">
       <div className="cta-background" />
 
       <div className="container cta-content">

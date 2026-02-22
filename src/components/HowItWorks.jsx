@@ -31,7 +31,7 @@ const STEPS = [
 
 const HowItWorks = () => {
     return (
-        <section className="hiw-section">
+        <section id="how-it-works" className="hiw-section">
             {/* Subtle top border */}
             <div className="hiw-top-border" />
 

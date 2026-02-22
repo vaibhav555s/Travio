@@ -71,7 +71,7 @@ const DestinationCards = () => {
     : DESTINATIONS.filter(d => d.tag === activeFilter)
 
   return (
-    <section className="destinations-section">
+    <section id="explore" className="destinations-section">
       <div className="container">
 
         {/* ── Section header ── */}
