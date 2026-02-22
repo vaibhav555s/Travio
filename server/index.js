@@ -10,6 +10,7 @@ import tripRoutes from "./routes/trip.routes.js"
 import planRoutes from "./routes/plan.routes.js"
 import collaboratorRoutes from "./routes/collaborator.routes.js"
 import weatherRoutes from "./routes/weather.js"
+import streetviewRoutes from "./routes/streetview.js"
 import connectDB from "./config/db.js";
 
 const app = express();
@@ -31,6 +32,7 @@ app.use('/api/trips', collaboratorRoutes);
 app.use('/api/trips', tripRoutes);
 app.use('/api/plans', planRoutes);
 app.use('/api/weather', weatherRoutes);
+app.use('/api/streetview', streetviewRoutes);
 
 // Error handler
 app.use((err, req, res, next) => {
