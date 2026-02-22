@@ -63,6 +63,20 @@ const TYPE_COLOR = {
   adventure: '#b07f9c', culture: '#9785b8', nightlife: '#d8aa6b', transport: '#92a8d1',
 }
 
+// Curated 360° photospheres for a realistic VR hackathon demo without API keys
+// Using official A-Frame CDN images to guarantee 100% uptime and no CORS/404 WebGL errors
+const VR_IMAGES = {
+  adventure: 'https://cdn.aframe.io/360-image-gallery-boilerplate/img/sechelt.jpg', // Mountain/Lake
+  beach: 'https://cdn.aframe.io/360-image-gallery-boilerplate/img/sechelt.jpg',
+  culture: 'https://cdn.aframe.io/360-image-gallery-boilerplate/img/city.jpg',
+  food: 'https://cdn.aframe.io/360-image-gallery-boilerplate/img/city.jpg',
+  hotel: 'https://cdn.aframe.io/360-image-gallery-boilerplate/img/city.jpg',
+  nightlife: 'https://cdn.aframe.io/360-image-gallery-boilerplate/img/city.jpg',
+  transport: 'https://cdn.aframe.io/360-image-gallery-boilerplate/img/city.jpg',
+  default: 'https://cdn.aframe.io/360-image-gallery-boilerplate/img/city.jpg'
+}
+
+
 const stagger = {
   hidden: {},
   show: { transition: { staggerChildren: 0.07 } },
@@ -97,6 +111,7 @@ export default function Dashboard() {
   const [activeAlert, setActiveAlert] = useState(null)   // { type, title, icon, prompt }
   const [simulating, setSimulating] = useState(null)     // which event is being processed
   const [dismissedAlert, setDismissedAlert] = useState(false)
+  const [vrData, setVrData] = useState(null)     // { location: string, type: string }
 
   const LIVE_EVENTS = [
     {
@@ -513,6 +528,12 @@ export default function Dashboard() {
                         </span>
                         <span className="tcd-act-energy">{act.energy} energy</span>
                         <span className="tcd-act-cost">{act.cost}</span>
+                        <button
+                          className="tcd-vr-btn"
+                          onClick={() => setVrData({ location: act.location || act.name || 'Your Destination', type: act.type })}
+                        >
+                          🥽 AR/VR View
+                        </button>
                       </div>
                     </div>
                   </motion.div>
@@ -717,6 +738,45 @@ export default function Dashboard() {
 
         </div>
       </div>
+
+      {/* ════════════════════════════════════
+          VR WALKTHROUGH MODAL
+      ════════════════════════════════════ */}
+      <AnimatePresence>
+        {vrData && (
+          <motion.div
+            className="tcd-vr-modal"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <div className="tcd-vr-header">
+              <div className="tcd-vr-title">
+                <span className="tcd-vr-icon">🥽</span>
+                <div>
+                  <p className="tcd-vr-label">Virtual Walkthrough</p>
+                  <p className="tcd-vr-loc">{vrData.location}</p>
+                </div>
+              </div>
+              <button className="tcd-vr-close" onClick={() => setVrData(null)}>
+                Close Experience ✕
+              </button>
+            </div>
+
+            <div className="tcd-vr-frame-wrapper" style={{ cursor: 'grab' }}>
+              <div className="tcd-vr-instructions">Drag to look around • Scroll to zoom</div>
+              <a-scene embedded vr-mode-ui="enabled: false">
+                <a-sky
+                  src={`/api/streetview/${encodeURIComponent(vrData.location + (meta?.destination ? ' ' + meta.destination : ''))}`}
+                  rotation="0 -90 0"
+                ></a-sky>
+                <a-camera position="0 1.6 0" look-controls="reverseMouseDrag: true"></a-camera>
+              </a-scene>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   )
 }
