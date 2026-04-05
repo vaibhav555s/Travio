@@ -7,7 +7,7 @@ import MetricBar from '../components/MetricBar'
 import CollaboratorModal from '../components/CollaboratorModal'
 import './PlanDetail.css'
 
-const API_BASE = '/api'
+const API_BASE = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : '/api'
 
 const ACCENTS = {
   recommended: '#E8631A',

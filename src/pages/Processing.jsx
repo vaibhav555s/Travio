@@ -13,7 +13,7 @@ const messages = [
 
 // Use relative /api path so Vite proxy forwards the request WITH auth headers
 // (calling localhost:5500 directly would bypass proxy and CORS would strip the Authorization header)
-const API_BASE = '/api'
+const API_BASE = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : '/api'
 
 const Processing = () => {
   const navigate = useNavigate()

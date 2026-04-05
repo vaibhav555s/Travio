@@ -3,6 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import './VoiceUI.css'
 
+const API_BASE = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : '/api'
+
 /* ── Mic SVG ── */
 const MicIcon = ({ size = 20 }) => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
@@ -102,7 +104,7 @@ const VoiceInput = () => {
         console.log("📍 Landing Page detected, extracting parameters for:", userInput)
         setIsExtracting(true)
         try {
-            const extractResponse = await fetch(`/api/itinerary/voice-to-setup`, {
+            const extractResponse = await fetch(`${API_BASE}/itinerary/voice-to-setup`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ prompt: userInput }),
@@ -153,7 +155,7 @@ const VoiceInput = () => {
             const formData = new FormData()
             formData.append("audio", blob)
 
-            const response = await fetch(`/api/speech-to-text`, {
+            const response = await fetch(`${API_BASE}/speech-to-text`, {
                 method: "POST",
                 body: formData,
             })

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import './Dashboard.css'
 
-const API_BASE = '/api'
+const API_BASE = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : '/api'
 
 /* ─── Helpers ──────────────────────────────────────────────── */
 
@@ -177,7 +177,7 @@ export default function Dashboard() {
         if (parsedMeta?.destination) {
           setWeatherLoading(true)
           try {
-            const wRes = await fetch(`/api/weather/${encodeURIComponent(parsedMeta.destination)}`)
+            const wRes = await fetch(`${API_BASE}/weather/${encodeURIComponent(parsedMeta.destination)}`)
             if (wRes.ok) {
               const wData = await wRes.json()
               setWeather(wData)
@@ -768,7 +768,7 @@ export default function Dashboard() {
               <div className="tcd-vr-instructions">Drag to look around • Scroll to zoom</div>
               <a-scene embedded vr-mode-ui="enabled: false">
                 <a-sky
-                  src={`/api/streetview/${encodeURIComponent(vrData.location + (meta?.destination ? ' ' + meta.destination : ''))}`}
+                  src={`${API_BASE}/streetview/${encodeURIComponent(vrData.location + (meta?.destination ? ' ' + meta.destination : ''))}`}
                   rotation="0 -90 0"
                 ></a-sky>
                 <a-camera position="0 1.6 0" look-controls="reverseMouseDrag: true"></a-camera>

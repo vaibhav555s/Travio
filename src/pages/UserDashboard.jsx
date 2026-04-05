@@ -20,7 +20,7 @@ const fadeUp = {
   show: { opacity: 1, y: 0, transition: { duration: 0.38, ease: [0.25, 0.1, 0.25, 1] } },
 }
 
-const BASE = '/api'
+const BASE = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : '/api'
 
 const TABS = ['My Trips', 'Shared', 'Invites']
 
